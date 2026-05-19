@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -22,14 +23,51 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-c1s1cl&l_t@j%is#z9ggpqg4x^*qxxcoos%nara)1jr27-jfw1'
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# LOCALHOST
+# ALLOWED_HOSTS = []
+# # SECURITY WARNING: don't run with debug turned on in production!
+# DEBUG = True
+# # Database
+# # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'pulari',
+#         'USER': 'root',
+#         'PASSWORD': 'root',   
+#         "HOST": "127.0.0.1",
+#         "PORT": "3306",
+#     }
+# }
+# STATIC_URL = '/static/'
+# STATIC_ROOT = BASE_DIR / "staticfiles"
 
-ALLOWED_HOSTS = []
+
+# DIGITALOCEAN
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = False
+# Database
+# https://docs.djangoproject.com/en/6.0/ref/settings/#databases
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'pulari',
+        'USER': 'root',
+        'PASSWORD': 'PMathan123!',   
+        "HOST": "206.189.135.106",
+        "PORT": "3306",
+    }
+}
+# Static and Media Files configuration
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+
+
 
 
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -46,7 +84,6 @@ INSTALLED_APPS = [
     'transactionbrowser',
     'receipt',
     'payment'
-
 ]
 
 MIDDLEWARE = [
@@ -77,22 +114,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'PulariTraders.wsgi.application'
-
-
-# Database
-# https://docs.djangoproject.com/en/6.0/ref/settings/#databases
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'pulari',
-        'USER': 'root',
-        'PASSWORD': 'root',   
-        "HOST": "127.0.0.1",
-        "PORT": "3306",
-    }
-}
-
-STATIC_ROOT = BASE_DIR / "staticfiles"
 
 MIGRATION_MODULES = {
     'account': None,
@@ -133,7 +154,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
-STATIC_URL = '/static/'
+
 
 STATICFILES_DIRS = [
     BASE_DIR / "Static",   # matches your folder name
