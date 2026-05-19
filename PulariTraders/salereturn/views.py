@@ -38,7 +38,7 @@ def salereturn(request):
 
         messages.success(request, "SaleReturn cancelled successfully ❌")
 
-        return redirect(f"/saleReturn?sr_rid={sr_rid}")
+        return redirect(f"/salereturn?sr_rid={sr_rid}")
 
     # ================= LOAD BILL =================
     if sr_rid:
@@ -119,7 +119,7 @@ def salereturn(request):
 
         return redirect(f"/salereturn?sr_rid={sale_return_header.sr_rid}")
 
-    return render(request, 'saleReturn/salereturn.html', {
+    return render(request, 'salereturn/salereturn.html', {
         'accounts': list(accounts),
         'items': list(items),
         'today': date.today(),

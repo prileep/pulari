@@ -123,7 +123,7 @@ def purchasereturn(request):
 
         return redirect(f"/purchasereturn?pr_rid={purchase_return_header.pr_rid}")
 
-    return render(request, 'purchaseReturn/purchasereturn.html', {
+    return render(request, 'purchasereturn/purchasereturn.html', {
         'accounts': list(accounts),
         'items': list(items),
         'today': date.today(),
