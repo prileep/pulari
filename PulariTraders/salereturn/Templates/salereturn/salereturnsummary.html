@@ -1,0 +1,86 @@
+
+<!-- <table style="width: 100%; border-top: 1px solid #ccc; margin-top: 10px;"> -->
+<table class="boxShape entryForm" id="accountTable">
+        <tr>
+          <td style="width: 1%;"></td>
+          <td style="width: 64%;"></td>
+          <td style="width:19%; text-align:right;">Total Amount&nbsp;</td>
+          <td style="width: 1%;"></td>
+          <td style="width:14%; text-align:right;"> 
+
+          <input type="number" step="0.01"
+          id="sr_amount"
+          name="sr_amount"
+
+          value="{{ salereturn_header.sr_amount|default:''}}"
+          class="form-control form-control-sm price text-end"
+          readonly tabindex="-1">
+          </td>
+        <td style="width: 1%;"></td>
+      
+    </tr>
+    <tr>
+          <td></td>
+          <td></td>
+          <td style="text-align:right;">Adjustment (-)&nbsp;</td>
+          <td></td>
+          <td style="text-align:right;"> 
+
+          <input type="number" step="0.01"
+          id="sr_discount" name="sr_discount"
+
+          value="{{ salereturn_header.sr_discount|default:''}}"
+          class="form-control form-control-sm price text-end" readonly tabindex="-1">
+          </td>
+        <td></td>
+      
+    </tr>
+    <tr>
+          <td></td>
+          <td class="info">
+            <span id="sr_net_amount_words"></span>
+          </td>
+          <td style="text-align:right;">Net Amount (Payable)&nbsp;</td>
+          <td></td>
+          <td style="text-align:right;"> 
+
+            <input type="number" step="0.01"
+            id="sr_net_amount"
+            name="sr_net_amount"
+
+            value="{{ salereturn_header.sr_net_amount|default:''}}"
+            class="form-control form-control-sm price text-end"
+            onchange="adjustAmount()"
+            tabindex="-1"
+            {% if salereturn_header.sr_sale_return_no %}
+              readonly
+            {% endif%}
+            >
+          </td>
+        <td></td>
+      
+    </tr>
+</table>
+<table style="width:100%; margin-top:10px;">
+  <tr>
+    <td></td>
+    <td style="width: 1%;"></td>
+    <td style="width: 14%;">
+      {% if salereturn_header.sr_rid and salereturn_header.sr_status != 'Cancelled' %}
+        <a href="/salereturn?cancel=1&sr_rid={{ salereturn_header.sr_rid }}"
+          class="searchLink"
+          onclick="return confirm('Are you sure to cancel this salereturn?');">
+          Cancel this salereturn
+        </a>
+        {% endif %}
+    </td>
+    <td style="text-align: right; width: 84%;">
+      {% if salereturn_header.sr_rid %}
+        
+      {% else %}
+        <button type="submit" class="submitButton">Submit</button>&nbsp;
+      {% endif %}
+     <button type="button" onclick="window.location.href='/salereturn'" class="submitButton">Clear</button> </td>
+    <td style="width: 1%;"></td>
+  </tr>
+</table>

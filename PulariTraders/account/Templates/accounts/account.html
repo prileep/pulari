@@ -1,0 +1,153 @@
+
+{% extends 'accounts/base.html' %}
+{% load static %}
+{% block content %}
+
+<div >
+
+            {% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-info">
+            {{ message }}</div>
+    {% endfor %}
+{% endif %}  
+
+               <form method="post" id="accountForm">
+
+    {% csrf_token %}
+ <table style="width: 70%; border: 1px solid black;" class="boxShape entryForm">
+           <tr class="formHeader">
+    <td></td>
+
+    <td colspan="3" style="text-align: left;">
+       Account
+    </td>
+</tr>
+   
+        <tr>
+            <td></td>
+            <td>Account ID</td>
+            <td>
+              <input type="text" name="acc_code" value="{{ account.acc_code|default:next_id }}"
+                style="width: 30%;"
+                class="form-control form-control-sm" readonly>
+       
+            </td>
+            <td></td>
+        </tr>
+
+        <tr>
+            <td></td>
+            <td>Name*</td>
+            <td>
+                <input type="text" name="acc_name" value="{{ account.acc_name }}"
+                       class="form-control form-control-sm" autocomplete="new-password">
+            </td>
+            <td></td>
+        </tr>
+
+        <tr>
+            <td></td>
+            <td>Place</td>
+            <td>
+                <input type="text" name="acc_place" value="{{ account.acc_place }}"
+                       class="form-control form-control-sm" autocomplete="new-password">
+            </td>
+            <td></td>
+        </tr>
+
+        <tr>
+            <td></td>
+            <td>Phone</td>
+            <td>
+                <input type="text" name="acc_phone" value="{{ account.acc_phone }}"
+                       class="form-control form-control-sm" autocomplete="new-password">
+            </td>
+            <td></td>
+        </tr>
+
+        <tr>
+            <td></td>
+            <td>Address</td>
+            <td>
+                <input type="text" name="acc_address" value="{{ account.acc_address }}"
+                       class="form-control form-control-sm" autocomplete=""new-password">
+            </td>
+            <td></td>
+        </tr>
+<!-- Customer -->
+<!-- Customer -->
+<tr>
+    <td></td>
+    <td>Customer?*</td>
+    <td>
+       <select name="acc_is_customer" id="acc_is_customer" class="form-control form-control-sm" style="width: 20%;">
+            <option value="" ></option>
+            <option value="No" {% if account and account.acc_is_customer == "No" %}selected{% endif %}>No</option>
+            <option value="Yes" {% if account and account.acc_is_customer == "Yes" %}selected{% endif %}>Yes</option>
+        </select>
+    </td>
+    <td></td>
+</tr>
+
+<!-- Supplier -->
+<tr>
+    <td></td>
+    <td>Supplier?*</td>
+    <td>
+        <select name="acc_is_supplier" id="acc_is_supplier" class="form-control form-control-sm"style="width: 20%;">
+            <option value="" ></option>
+            <option value="No" {% if account and account.acc_is_supplier == "No" %}selected{% endif %}>No</option>
+            <option value="Yes" {% if account and account.acc_is_supplier == "Yes" %}selected{% endif %}>Yes</option>
+        </select>
+    </td>
+    <td></td>
+</tr>
+
+<!-- Staff -->
+<tr>
+    <td></td>
+    <td>Staff?*</td>
+    <td>
+        <select name="acc_is_staff" id="acc_is_staff" class="form-control form-control-sm" style="width: 20%;">
+              <option value="" ></option>
+            <option value="No" {% if account and account.acc_is_staff == "No" %}selected{% endif %}>No</option>
+            <option value="Yes" {% if account and account.acc_is_staff == "Yes" %}selected{% endif %}>Yes</option>
+        </select>
+        
+
+    </td>
+    <span id="selectError" style="color:red;"></span>
+    <td></td>
+</tr>
+    </table>
+    <table style="width: 70%;">
+            <tr class="rowSpacing"><td></td></tr>
+            <tr>
+                <td style="text-align: right;">
+                     
+                    <td style="text-align: right;">
+                        <a href="{% url 'account_list' %}">
+                            Search
+                        </a>
+                        &nbsp;&nbsp;&nbsp;&nbsp;
+                        <button type="submit" class="submitButton">
+                            Save
+                        </button>&nbsp;
+                        <button type="button" onclick="location.reload();" class="submitButton">
+                            Cancel
+                        </button>
+                       
+                    </td>
+            </tr>
+        </table>
+
+
+</form>
+
+          
+
+</div>
+<script src="{% static 'accounts/js/account.js' %}"></script>
+
+{% endblock %}

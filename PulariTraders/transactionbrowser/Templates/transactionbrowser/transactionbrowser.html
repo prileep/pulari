@@ -1,0 +1,67 @@
+
+{% extends 'accounts/base.html' %}
+{% load static %}
+{% block content %}
+
+{% csrf_token %}
+
+    <table>
+        <tr>
+            <td style="width: 100%;">
+                {% include "transactionbrowser/tranheader.html" %}
+            </td>
+        </tr>
+    </table>
+    <table id="tblTransactionBrowserItems" style="visibility: hidden; display: none;">
+        <tr class="formHeader">
+            <td style="width: 1%;"></td>
+            <td style="width: 5%;">SL</td>
+            <td style="width: 10%;">Date</td>
+            <td style="width: 1%;"></td>        
+            <td style="width: 20%;">Account</td>
+            <td style="width: 1%;"></td>
+            <td style="width: 8%;">Type</td>
+            <td style="width: 1%;"></td>
+            <td style="width: 25%;">Notes</td>
+            <td style="width: 1%;"></td>
+            <td style="width: 8%; text-align: right;">Cash-In</td>
+            <td style="width: 1%;"></td>
+            <td style="width: 8%; text-align: right;">Cash-Out</td>
+            <td style="width: 1%;"></td>
+            <td style="width: 8%; text-align: right;">Balance</td>
+            <td style="width: 1%;"></td>
+        </tr>
+        <tr class="boxShape reportItemRow" id="rowTransactionBrowserItems">
+            <td></td>
+            <td>
+                <a id="tdSl" href=""></a>
+            </td>
+            <td id="tdDate"></td>
+            <td></td>
+            <td id="tdAccount"></td>
+            <td></td>
+            <td id="tdType"></td>
+            <td></td>
+            <td id="tdNotes"></td>
+            <td></td>
+            <td id="tdCashIn" style="text-align: right;"></td>
+            <td></td>
+            <td id="tdCashOut"  style="text-align: right;"></td>
+            <td></td>
+            <td id="tdBalance" style="text-align: right;"></td>
+            <td></td>
+        </tr>
+    </table>
+<table>
+    <tr>
+        <td style="text-align: right;">
+            <span id="spnErrorInfo" class="message-warning"></span>
+        </td>
+    </tr>
+</table>
+{{ accounts|json_script:"accounts-data" }}
+
+
+<script src="{% static 'js/transactionbrowser.js' %}"></script>
+
+{% endblock %}

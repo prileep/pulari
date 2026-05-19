@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Transaction Report</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            color: #222;
+        }
+
+        .page {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+        }
+
+        h2 {
+            margin: 0;
+            font-size: 22px;
+        }
+
+        .meta {
+            font-size: 13px;
+            line-height: 1.6;
+            text-align: right;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        th, td {
+            border: 1px solid #cfcfcf;
+            padding: 8px 10px;
+            vertical-align: top;
+        }
+
+        th {
+            background: #f3f3f3;
+            text-align: left;
+        }
+
+        td.num, th.num {
+            text-align: right;
+        }
+
+        td.center, th.center {
+            text-align: center;
+        }
+
+        .muted {
+            color: #777;
+        }
+
+        .summary-row td {
+            font-weight: bold;
+            background: #fafafa;
+        }
+
+        @media print {
+            body {
+                margin: 0;
+            }
+            .page {
+                max-width: none;
+                margin: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="page">
+    <div class="header">
+        <div>
+            <h2>Transaction Report</h2>
+            <div class="muted">Generated on: <span id="generatedOn"></span></div>
+        </div>
+        <div class="meta" id="filtersText"></div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th class="center">#</th>
+                <th>Date</th>
+                <th>Account</th>
+                <th>Type</th>
+                <th>Notes</th>
+                <th class="num">Cash In</th>
+                <th class="num">Cash Out</th>
+                <th class="num">Balance</th>
+            </tr>
+        </thead>
+        <tbody id="reportBody">
+            <tr>
+                <td colspan="8" class="center">Loading...</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<script>
+function formatIndianCurrency(value) {
+    return new Intl.NumberFormat("en-IN", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+    }).format(Number(value || 0));
+}
+
+function getParams() {
+    return new URLSearchParams(window.location.search);
+}
+
+function buildFiltersText(params) {
+    const parts = [];
+    const map = [
+        ["acctran_ref_type", "Type"],
+        ["status", "Status"],
+        ["from_date", "From"],
+        ["to_date", "To"],
+        ["account_rid", "Account"],
+        ["refno", "Ref No"],
+        ["notes", "Notes"],
+        ["amount_from", "Amount From"],
+        ["amount_to", "Amount To"],
+    ];
+
+    map.forEach(([key, label]) => {
+        const val = params.get(key);
+        if (val) parts.push(`${label}: ${val}`);
+    });
+
+    return parts.length ? parts.join("<br>") : "All records";
+}
+
+async function loadReport() {
+    const params = getParams();
+
+    document.getElementById("generatedOn").textContent = new Date().toLocaleString();
+    document.getElementById("filtersText").innerHTML = buildFiltersText(params);
+
+    const body = document.getElementById("reportBody");
+    body.innerHTML = `<tr><td colspan="8" class="center">Loading...</td></tr>`;
+
+    try {
+        const res = await fetch(`/transactionbrowser/transaction-search/?${params.toString()}`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+        const data = await res.json();
+
+        if (!data.transactions || data.transactions.length === 0) {
+            body.innerHTML = `<tr><td colspan="8" class="center">No matching records found!</td></tr>`;
+            return;
+        }
+
+        const rows = [];
+        let i = 0;
+        let totCashIn = 0;
+        let totCashOut = 0;
+        let lastItem = null;
+
+        data.transactions.forEach(item => {
+            lastItem = item;
+            totCashIn += Number(item.cr_amt || 0);
+            totCashOut += Number(item.dr_amt || 0);
+
+            const notes = (item.acc_notes || "").replaceAll(" • ", " • <wbr> ");
+
+            rows.push(`
+                <tr>
+                    <td class="center">${++i}</td>
+                    <td>${item.acctran_date || ""}</td>
+                    <td>${item.acc_name || ""}</td>
+                    <td>${item.acctran_ref_type || ""}</td>
+                    <td>${notes}</td>
+                    <td class="num">${item.cr_amt == 0 ? "-" : formatIndianCurrency(item.cr_amt)}</td>
+                    <td class="num">${item.dr_amt == 0 ? "-" : formatIndianCurrency(item.dr_amt)}</td>
+                    <td class="num">${formatIndianCurrency(item.balance)}</td>
+                </tr>
+            `);
+        });
+
+        rows.push(`
+            <tr class="summary-row">
+                <td colspan="4" class="num">Opening</td>
+                <td class="num">${formatIndianCurrency(lastItem.open_balance)}</td>
+                <td class="num">(-)${formatIndianCurrency(totCashIn)}</td>
+                <td class="num">${formatIndianCurrency(totCashOut)}</td>
+                <td class="num">${formatIndianCurrency(lastItem.balance)}</td>
+            </tr>
+        `);
+
+        body.innerHTML = rows.join("");
+
+        setTimeout(() => {
+            window.print();
+        }, 300);
+
+    } catch (err) {
+        console.error(err);
+        body.innerHTML = `<tr><td colspan="8" class="center">Error loading report</td></tr>`;
+    }
+}
+
+window.addEventListener("load", loadReport);
+</script>
+</body>
+</html>

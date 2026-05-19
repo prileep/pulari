@@ -1,0 +1,90 @@
+
+<!-- <table style="width: 100%; border-top: 1px solid #ccc; margin-top: 10px;"> -->
+<table class="boxShape entryForm" id="accountTable">
+        <tr>
+          <td style="width: 1%;"></td>
+          <td style="width: 64%;"></td>
+          <td style="width:19%; text-align:right;">Total Amount&nbsp;</td>
+          <td style="width: 1%;"></td>
+          <td style="width:14%; text-align:right;"> 
+
+          <input type="number" step="0.01"
+          id="bh_amount"
+          name="bh_amount"
+
+          value="{{ bill_header.bh_amount|default:''}}"
+          class="form-control form-control-sm price text-end"
+          readonly tabindex="-1">
+          </td>
+        <td style="width: 1%;"></td>
+      
+    </tr>
+    <tr>
+          <td></td>
+          <td></td>
+          <td style="text-align:right;">Adjustment (-)&nbsp;</td>
+          <td></td>
+          <td style="text-align:right;"> 
+
+          <input type="number" step="0.01"
+          id="bh_discount" name="bh_discount"
+
+          value="{{ bill_header.bh_discount|default:''}}"
+          class="form-control form-control-sm price text-end" readonly tabindex="-1">
+          </td>
+        <td></td>
+      
+    </tr>
+    <tr>
+          <td></td>
+          <td class="info">
+            <span id="bh_net_amount_words"></span>
+          </td>
+          <td style="text-align:right;">Net Amount (Payable)&nbsp;</td>
+          <td></td>
+          <td style="text-align:right;"> 
+
+            <input type="number" step="0.01"
+            id="bh_net_amount"
+            name="bh_net_amount"
+
+            value="{{ bill_header.bh_net_amount|default:''}}"
+            class="form-control form-control-sm price text-end"
+            onchange="adjustAmount()"
+            tabindex="-1"
+            {% if bill_header.bh_bill_no %}
+              readonly
+            {% endif%}
+            >
+          </td>
+        <td></td>
+      
+    </tr>
+</table>
+<table style="width:100%; margin-top:10px;">
+  <tr>
+    <td></td>
+    <td style="width: 1%;"></td>
+    <td style="width: 14%;">
+      {% if bill_header.bh_rid and bill_header.bh_status != 'Cancelled' %}
+        <a href="/bill?cancel=1&bh_rid={{ bill_header.bh_rid }}"
+          class="searchLink"
+          onclick="return confirm('Are you sure to cancel this bill?');">
+          Cancel this bill
+        </a>
+        {% endif %}
+    </td>
+    <td style="text-align: right; width: 84%;">
+      {% if bill_header.bh_rid %}
+        <button type="button" class="submitButton"
+          data-rid="{{ bill_header.bh_rid }}"
+          onclick="openPrintBill(this.dataset.rid)">Print</button>&nbsp;
+      {% else %}
+        <button type="submit" class="submitButton">Submit</button>&nbsp;
+      {% endif %}
+
+      <button type="button" onclick="window.location.href='/bill'" class="submitButton">Clear</button>
+    </td>
+    <td style="width: 1%;"></td>
+  </tr>
+</table>

@@ -1,0 +1,87 @@
+
+<!-- <table style="width: 100%; border-top: 1px solid #ccc; margin-top: 10px;"> -->
+<table class="boxShape entryForm" id="accountTable">
+        <tr>
+          <td style="width: 1%;"></td>
+          <td style="width: 64%;"></td>
+          <td style="width:19%; text-align:right;">Total Amount&nbsp;</td>
+          <td style="width: 1%;"></td>
+          <td style="width:14%; text-align:right;"> 
+
+          <input type="number" step="0.01"
+          id="pr_amount"
+          name="pr_amount"
+
+          value="{{ purchasereturn_header.pr_amount|default:''}}"
+          class="form-control form-control-sm price text-end"
+          readonly tabindex="-1">
+          </td>
+        <td style="width: 1%;"></td>
+      
+    </tr>
+    <tr>
+          <td></td>
+          <td></td>
+          <td style="text-align:right;">Adjustment (-)&nbsp;</td>
+          <td></td>
+          <td style="text-align:right;"> 
+
+          <input type="number" step="0.01"
+          id="pr_discount" name="pr_discount"
+
+          value="{{ purchasereturn_header.pr_discount|default:''}}"
+          class="form-control form-control-sm price text-end" readonly tabindex="-1">
+          </td>
+        <td></td>
+      
+    </tr>
+    <tr>
+          <td></td>
+          <td class="info">
+            <span id="pr_net_amount_words"></span>
+          </td>
+          <td style="text-align:right;">Net Amount (Payable)&nbsp;</td>
+          <td></td>
+          <td style="text-align:right;"> 
+
+            <input type="number" step="0.01"
+            id="pr_net_amount"
+            name="pr_net_amount"
+
+            value="{{ purchasereturn_header.pr_net_amount|default:''}}"
+            class="form-control form-control-sm price text-end"
+            onchange="adjustAmount()"
+            tabindex="-1"
+            {% if purchasereturn_header.pr_purchase_return_no %}
+              readonly
+            {% endif%}
+            >
+          </td>
+        <td></td>
+      
+    </tr>
+</table>
+<table style="width:100%; margin-top:10px;">
+  <tr>
+    <td></td>
+    <td style="width: 1%;"></td>
+    <td style="width: 14%;">
+      {% if purchasereturn_header.pr_rid and purchasereturn_header.pr_status != 'Cancelled' %}
+        <a href="/purchasereturn?cancel=1&pr_rid={{ purchasereturn_header.pr_rid }}"
+          class="searchLink"
+          onclick="return confirm('Are you sure to cancel this purchasereturn?');">
+          Cancel this purchasereturn
+        </a>
+        {% endif %}
+    </td>
+    <td style="text-align: right; width: 84%;">
+      {% if purchasereturn_header.pr_rid %}
+        
+      {% else %}
+        <button type="submit" class="submitButton">Submit</button>&nbsp;
+      {% endif %}
+     <button type="button" onclick="window.location.href='/purchasereturn'" class="submitButton">Clear</button>
+  </td>
+    <td style="width: 1%;"></td>
+  </tr>
+</table>

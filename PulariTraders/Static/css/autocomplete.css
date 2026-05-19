@@ -1,0 +1,52 @@
+.suggestion-box {
+    position: absolute;
+    z-index: 9999;
+    box-sizing: border-box;
+
+    background: #eaf6ff;
+    /* light blue */
+    border: 1px solid #b6dfff;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.suggestion-box div {
+    padding: 6px 10px;
+    cursor: pointer;
+}
+
+.suggestion-box div:hover {
+    background-color: #eef4ff;
+}
+
+#suggestionBox {
+    position: absolute;
+    width: 100%;
+    max-width: 300px;
+    background: white;
+    border: 1px solid #ccc;
+    z-index: 9999;
+}
+
+.suggestion-item {
+    padding: 6px 10px;
+    cursor: pointer;
+    background: #eaf6ff;
+}
+
+.suggestion-item:hover {
+    background: #d6eeff;
+}
+
+.suggestion-item.active {
+    background: orange;
+    font-weight: bold;
+}
+
+.readonly-style {
+    background-color: #e9ecef;
+    /* light grey */
+    color: #6c757d;
+    pointer-events: none;
+    /* prevents clicks */
+}

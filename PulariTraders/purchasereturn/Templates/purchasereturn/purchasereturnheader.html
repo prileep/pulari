@@ -1,0 +1,166 @@
+<table class="boxShape entryForm" id="accountTable" >
+    <!-- HEADER -->
+    <tr class="formHeaderReturnEntry">
+        <td></td>
+        <td colspan="4" style="text-align: left;">
+            Purchase Return
+        </td>
+        <td style="text-align: right;">
+            <a href="" class="searchLink">Search..</a>
+        </td>
+        <td></td>
+    </tr>
+
+    <tr class="rowSpacing"><td></td></tr>
+
+    <!-- TYPE + BILL NO -->
+    <tr>
+        <td style="width: 1%;"></td>
+
+        <td style="width: 9%;">Type</td>
+        <td style="width: 50%;">
+            <div style="display:flex; gap:15px; align-items:center;">
+                
+                <label>
+                    <input type="radio" name="pr_counter_purchase" value="0"
+                        {% if not purchase_return_header or purchase_return_header.pr_counter_sale == 0 %}checked{% endif %}
+                        {% if purchase_return_header and purchase_return_header.pr_rid %}
+                            disabled
+                        {% endif %}>
+                    Account Sale
+                </label>
+
+                <label>
+                    <input type="radio" name="pr_counter_purchase" value="1"
+                        {% if purchase_return_header and purchase_return_header.pr_counter_sale == 1 %}checked{% endif %}
+                        {% if purchase_return_header and purchase_return_header.pr_rid %}
+                            disabled
+                        {% endif %}>
+                    Counter Sale
+                </label>
+
+            </div>
+        </td>
+
+        <td></td>
+
+        <td style="width: 8%;">Bill No</td>
+        <td style="width: 30%;">
+            <input type="text"
+                   name="pr_purchase_return_no"
+                   value="{{ purchase_return_header.pr_purchase_return_no|default:'' }}"
+                   class="form-control form-control-sm"
+                   readonly tabindex="-1">
+        </td>
+
+        <td></td>
+    </tr>
+
+    <!-- ACCOUNT + DATE -->
+    <tr>
+        <td></td>
+
+        <td>Account</td>
+        <td>
+            <table>
+                <tr>
+                    <td style="width: 85%;">
+                        <!-- hidden RID -->
+                        <input type="hidden"
+                            id="pr_acc_rid"
+                            name="pr_acc_rid"
+                            value="{{ purchase_return_header.pr_acc_rid|default:'' }}">
+
+                        <!-- visible name -->
+                        <input type="text"
+                            id="pr_acc_name"
+                            name="pr_acc_name"
+                            class="form-control form-control-sm"
+                            value="{{ account.acc_disp_name|default:'' }}"
+                            autocomplete="off"
+                            {% if purchase_return_header and purchase_return_header.pr_rid %}
+                                readonly
+                            {% endif %}>
+                        <div id="suggestionBox" class="suggestion-box"></div>
+                    </td>
+                    <td style="width: 15%;">
+                        <input type="text"
+                            id="pr_acc_code" name="pr_acc_code"
+                            value="{{ account.acc_code|default:'' }}"
+                            class="form-control form-control-sm"
+                            readonly tabindex="-1">
+                    </td>
+                </tr>
+            </table>
+            
+        </td>
+
+        <td></td>
+
+        <td>Date</td>
+        <td>
+            <input type="date"
+                   name="pr_purchase_return_date"
+                   id="pr_purchase_return_date"
+                   value="{% if purchase_return_header %}{{ purchase_return_header.pr_purchase_return_date|date:'Y-m-d' }}{% else %}{{ today|date:'Y-m-d' }}{% endif %}"
+                   class="form-control form-control-sm"
+                   {% if purchase_return_header and purchase_return_header.pr_rid %}
+                    readonly
+                   {% endif %}
+                    tabindex="-1">
+        </td>
+
+        <td></td>
+    </tr>
+
+    <!-- ADDRESS -->
+    <tr id="accountDetailsRow">
+        <td></td>
+
+        <td>Address</td>
+        <td>
+            <input type="text"
+                   id="accountAddress"
+                   name="address"
+                   class="form-control form-control-sm"
+                   value="{{ account.acc_address|default:'' }}"
+                   tabindex="-1"
+                   {% if purchase_return_header and purchase_return_header.prh_rid %}
+                        readonly
+                    {% endif %}>
+        </td>
+
+        <td></td>
+
+        <td>Phone</td>
+        <td>
+            <input type="text"
+                   id="accountPhone"
+                   name="phone"
+                   class="form-control form-control-sm"
+                   value="{{ account.acc_phone|default:'' }}"
+                   tabindex="-1"
+                   {% if purchase_return_header and purchase_return_header.pr_rid %}
+                        readonly
+                    {% endif %}>
+        </td>
+    </tr>
+    <!-- NOTES -->
+    <tr>
+        <td></td>
+
+        <td>Notes</td>
+        <td>
+            <input type="text"
+                id="pr_notes" name="pr_notes"
+                class="form-control form-control-sm"
+                value="{{ purchase_return_header.pr_notes|default:'' }}"
+                {% if purchase_return_header and purchase_return_header.pr_rid %}
+                readonly
+                {% endif %}>
+        </td>
+
+        <td></td>
+    </tr>
+
+</table>

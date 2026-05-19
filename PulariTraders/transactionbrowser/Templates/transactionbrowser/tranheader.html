@@ -1,0 +1,177 @@
+<table class="boxShape entryForm" id="transactionBrowserTable">
+    <tr class="formHeader">
+        <td></td>
+        <td colspan="8" style="text-align:left;">Transaction Browser</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td style="width:1%;"></td>
+
+        <td style="width:15%;">Type</td>
+
+        <td style="width:1%;"></td>
+
+        <td style="width:26%;">
+            <select id="acctran_ref_type"
+                    name="acctran_ref_type"
+                    class="form-control form-control-sm">
+                <option value=""></option>
+                <option value="Bill">Bill</option>
+                <option value="Bill Return">Bill Return</option>
+                <option value="Receipt">Receipt</option>
+                <option value="Purchase">Purchase</option>
+                <option value="Purchase Return">Purchase Return</option>
+            </select>
+        </td>
+
+        <td style="width:1%;"></td>
+
+        <td style="width:15%;">Date</td>
+
+        <td>
+            <table style="width:100%;">
+                <tr>
+                    <td style="width:45%;">
+                        <input type="date"
+                               id="tran_from_date"
+                               name="tran_from_date"
+                               value="{{ today|date:'Y-m-d' }}"
+                               class="form-control form-control-sm">
+                    </td>
+
+                    <td style="width:10%; text-align:center;">To</td>
+
+                    <td style="width:45%;">
+                        <input type="date"
+                               id="tran_to_date"
+                               name="tran_to_date"
+                               value="{{ today|date:'Y-m-d' }}"
+                               class="form-control form-control-sm">
+                    </td>
+                </tr>
+            </table>
+        </td>
+
+        <td style="width:1%;"></td>
+    </tr>
+
+    <tr>
+        <td></td>
+
+        <td>Status</td>
+
+        <td></td>
+
+        <td>
+            <select id="tran_status"
+                    name="tran_status"
+                    class="form-control form-control-sm">
+                <option value="Active">Active</option>
+                <option value="Cancelled">Cancelled</option>
+            </select>
+        </td>
+
+        <td></td>
+
+        <td>Account</td>
+
+        <td>
+            <input type="text"
+                   id="tran_account"
+                   name="tran_account"
+                   class="form-control form-control-sm"
+                   autocomplete="off">
+            <input type="hidden"
+                id="tran_account_rid"
+                name="tran_account_rid">
+            <div id="suggestionBox"
+                 class="suggestion-box">
+            </div>
+        </td>
+
+        <td></td>
+    </tr>
+
+    <tr>
+        <td></td>
+
+        <td>Ref No</td>
+
+        <td></td>
+
+        <td>
+            <input type="text"
+                   id="tran_refno"
+                   name="tran_refno"
+                   class="form-control form-control-sm"
+                   placeholder="Bill#, Purchase#, Receipt# etc..">
+        </td>
+
+        <td></td>
+
+        <td>Notes</td>
+
+        <td>
+            <input type="text"
+                   id="tran_notes"
+                   name="tran_notes"
+                   class="form-control form-control-sm">
+        </td>
+
+        <td></td>
+    </tr>
+
+
+    <tr>
+        <td></td>
+
+        <td>Amount</td>
+
+        <td></td>
+
+        <td>
+            <table style="width:100%;">
+                <tr>
+                    <td style="width:45%;">
+                        <input type="text"
+                               id="tran_amount_from"
+                               name="tran_amount_from"
+                               class="form-control form-control-sm">
+                    </td>
+
+                    <td style="width:10%; text-align:center;">To</td>
+
+                    <td style="width:45%;">
+                        <input type="text"
+                               id="tran_amount_to"
+                               name="tran_amount_to"
+                               class="form-control form-control-sm">
+                    </td>
+                </tr>
+            </table>
+        </td>
+
+        <td></td>
+
+        <td></td>
+
+        <td colspan="7" style="text-align:right;">
+            <a href="#"
+               id="transactionPrintBtn"
+               class="searchLink"
+               style="font-size:larger;"
+               onclick="printTransactions()">
+                Print
+            </a>
+            <a href="#"
+               id="transactionSearchBtn"
+               class="searchLink"
+               style="font-size:larger;">
+                Search
+            </a>
+
+            &nbsp;&nbsp;&nbsp;
+        </td>
+        <td></td>
+    </tr>
+</table>

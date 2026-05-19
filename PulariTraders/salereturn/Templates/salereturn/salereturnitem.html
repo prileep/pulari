@@ -1,0 +1,93 @@
+<table class="boxShape entryForm" id="itemsTable">
+
+    <tr class="formHeaderReturnEntry">
+        <td style="width: 1%;"></td>
+        <td style="width:6%; text-align:left;">SL.</td>
+        <td style="width: 1%;"></td>
+        <td style="width: 44%; text-align:left;">Item</td>
+        <td style="width: 1%;"></td>
+        <td style="width: 7%; text-align:right;">Stock</td>
+        <td style="width: 1%;"></td>
+        <td style="width:10%; text-align:right;">Quantity</td>
+        <td style="width: 1%;"></td>
+        <td style="width:13%; text-align:right;">Price</td>
+        <td style="width: 1%;"></td>
+        <td style="width:13%; text-align:right;">Total</td>
+        <td style="width: 1%;"></td>
+    </tr>
+    {% for saleReturnDetail in sale_return_details %}
+    <!-- 🔷 FIRST ROW -->
+    <tr>
+
+        <td></td>
+        <td>
+            
+                   <input type="text" class="form-control form-control-sm slno" name="slno" readonly
+                   tabindex="-1">
+        </td>
+
+        <td></td>
+        <td>
+            <input type="hidden" id="srd_item_rid" name="srd_item_rid" value="0">
+
+            <input type="text" id="item_name" name="item_name"
+                   class="form-control form-control-sm item-name"
+                   {% if bill_header.sr_rid %}
+                        readonly
+                    {% endif %}
+                    value="{{ saleReturnDetail.item.item_name|default:'' }}"> 
+        </td>
+
+        <td></td>
+
+          <td>
+            
+            <input type="number" id="item_stk" name="item_stk"
+                    class="form-control form-control-sm item-stk" readonly
+                    value="{{ saleReturnDetail.item.item_stk|default:0|floatformat:2  }}"
+                    tabindex="-1">
+                  
+        </td>
+
+        <td></td>
+
+        <td style="text-align: right;">
+            <input type="number" step="0.01"
+            id="srd_qty"
+                   name="srd_qty"
+                   class="form-control form-control-sm quantity"
+                   onchange="handleQtyChange(this)"
+                   {% if bill_header.sr_rid %}
+                        readonly
+                    {% endif %}
+                    value="{{ saleReturnDetail.srd_qty|default:'' }}">
+        </td>
+
+        <td></td>
+        <td>
+            <input type="number" step="0.01"
+                id="srd_amount"
+                   name="srd_amount"
+                   class="form-control form-control-sm price text-end" 
+                   onchange="calculateBill(this)"
+                   {% if bill_header.sr_rid %}
+                        readonly
+                    {% endif %}
+                    value="{{ saleReturnDetail.srd_amount|default:'' }}">
+        </td>
+
+        <td></td>
+        <td>
+            <input type="number" step="0.01"
+                    id="srd_total_amount"
+                   name="srd_total_amount"
+                   class="form-control form-control-sm total text-end"
+                   readonly
+                   tabindex="-1"
+                   value="{{ saleReturnDetail.srd_total_amount|default:'' }}">
+        </td>
+        <td></td>
+    </tr>
+    {% endfor %}
+
+</table>

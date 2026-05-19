@@ -1,0 +1,162 @@
+<table class="boxShape entryForm" id="accountTable">
+    <!-- HEADER -->
+    <tr class="formHeader">
+        <td></td>
+        <td colspan="4" style="text-align: left;">
+            Bill
+        </td>
+        <td style="text-align: right;">
+            <a href="" class="searchLink">Search..</a>
+        </td>
+        <td></td>
+    </tr>
+
+    <tr class="rowSpacing"><td></td></tr>
+
+    <!-- TYPE + BILL NO -->
+    <tr>
+        <td style="width: 1%;"></td>
+
+        <td style="width: 9%;">Sale Type</td>
+        <td style="width: 50%;">
+            <div style="display:flex; gap:15px; align-items:center;">
+                
+                <label>
+                    <input type="radio" id="bh_customer_sle" name="bh_counter_sale" value="0"
+                        {% if not bill_header or bill_header.bh_counter_sale == 0 %}checked{% endif %}
+                        {% if bill_header and bill_header.bh_rid %}
+                            disabled
+                        {% endif %} 
+                        onclick="setSaleType(this.value)">
+                    Account Sale
+                </label>
+
+                <label>
+                    <input type="radio" id="bh_counter_sle" name="bh_counter_sale" value="1"
+                        {% if bill_header and bill_header.bh_counter_sale == 1 %}checked{% endif %}
+                        {% if bill_header and bill_header.bh_rid %}
+                            disabled
+                        {% endif %} 
+                        onclick="setSaleType(this.value)">
+                    Cash Party
+                </label>
+
+            </div>
+        </td>
+
+        <td></td>
+
+        <td style="width: 8%;">Bill No</td>
+        <td style="width: 30%;">
+            <input type="text"
+                   name="bh_bill_no"
+                   value="{{ bill_header.bh_bill_no|default:'' }}"
+                   class="form-control form-control-sm"
+                   readonly tabindex="-1">
+        </td>
+
+        <td></td>
+    </tr>
+
+    <!-- ACCOUNT + DATE -->
+    <tr>
+        <td></td>
+
+        <td>Account</td>
+        <td>
+            <table>
+                <tr>
+                    <td style="width: 80%;">
+                        <!-- hidden RID -->
+                        <input type="hidden"
+                            id="bh_acc_rid"
+                            name="bh_acc_rid"
+                            value="{{ bill_header.bh_acc_rid|default:'' }}">
+
+                        <!-- visible name -->
+                        <input type="text"
+                            id="bh_acc_name"
+                            name="bh_acc_name"
+                            class="form-control form-control-sm"
+                            value="{{ account.acc_disp_name|default:'' }}"
+                            autocomplete="off"
+                            {% if bill_header and bill_header.bh_rid %}
+                                readonly
+                            {% endif %}>
+                               <div id="suggestionBox" class="suggestion-box"></div>
+                    </td>
+
+                    <td style="width: 20%;">
+                        <input type="text"
+                            id="bh_acc_code" name="bh_acc_code"
+                            value="{{ account.acc_code|default:'' }}"
+                            class="form-control form-control-sm"
+                            readonly tabindex="-1">
+                    </td>
+                </tr>
+            </table>
+            
+        </td>
+
+        <td></td>
+
+        <td>Date</td>
+        <td>
+            <input type="date"
+                   name="bh_bill_date"
+                   id="bh_bill_date"
+                   value="{% if bill_header %}{{ bill_header.bh_bill_date|date:'Y-m-d' }}{% else %}{{ today|date:'Y-m-d' }}{% endif %}"
+                   class="form-control form-control-sm"
+                   {% if bill_header and bill_header.bh_rid %}
+                                readonly
+                            {% endif %}
+                    tabindex="-1">
+        </td>
+
+        <td></td>
+    </tr>
+
+    <!-- ADDRESS -->
+    <tr id="accountDetailsRow">
+        <td></td>
+
+        <td>Address</td>
+        <td>
+            <input type="text"
+                   id="accountAddress"
+                   name="address"
+                   class="form-control form-control-sm"
+                   value="{{ account.acc_address|default:'' }}"
+                   tabindex="-1" readonly>
+        </td>
+
+        <td></td>
+
+        <td>Phone</td>
+        <td>
+            <input type="text"
+                   id="accountPhone"
+                   name="phone"
+                   class="form-control form-control-sm"
+                   value="{{ account.acc_phone|default:'' }}"
+                   tabindex="-1" readonly >
+        </td>
+    </tr>
+    <!-- NOTES -->
+    <tr>
+        <td></td>
+        <td>Notes</td>
+        <td>
+            <input type="text"
+                id="bh_notes" name="bh_notes"
+                class="form-control form-control-sm"
+                value="{{ bill_header.bh_notes|default:'' }}"
+                {% if bill_header and bill_header.bh_rid %}
+                readonly
+                {% endif %}>
+        </td>
+
+        <td></td>
+    </tr>
+
+</table>

@@ -1,0 +1,93 @@
+<table class="boxShape entryForm" id="itemsTable">
+
+    <tr class="formHeader">
+        <td style="width: 1%;"></td>
+        <td style="width:6%; text-align:left;">SL.</td>
+        <td style="width: 1%;"></td>
+        <td style="width: 44%; text-align:left;">Item</td>
+        <td style="width: 1%;"></td>
+        <td style="width: 7%; text-align:right;">Stock</td>
+        <td style="width: 1%;"></td>
+        <td style="width:10%; text-align:right;">Quantity</td>
+        <td style="width: 1%;"></td>
+        <td style="width:13%; text-align:right;">Price</td>
+        <td style="width: 1%;"></td>
+        <td style="width:13%; text-align:right;">Total</td>
+        <td style="width: 1%;"></td>
+    </tr>
+    {% for billDetail in bill_details %}
+    <!-- 🔷 FIRST ROW -->
+    <tr>
+
+        <td></td>
+        <td>
+            
+                   <input type="text" class="form-control form-control-sm slno" name="slno" readonly
+                   tabindex="-1">
+        </td>
+
+        <td></td>
+        <td>
+            <input type="hidden" id="bd_item_rid" name="bd_item_rid" value="0">
+
+            <input type="text" id="item_name" name="item_name"
+                   class="form-control form-control-sm item-name"
+                   {% if bill_header.bh_rid %}
+                        readonly
+                    {% endif %}
+                    value="{{ billDetail.item.item_name|default:'' }}"> 
+        </td>
+
+        <td></td>
+
+          <td>
+            
+            <input type="number" id="item_stk" name="item_stk"
+                    class="form-control form-control-sm item-stk" readonly
+                    value="{{ billDetail.item.item_stk|default:0|floatformat:2  }}"
+                    tabindex="-1">
+                  
+        </td>
+
+        <td></td>
+
+        <td style="text-align: right;">
+            <input type="number" step="0.01"
+            id="bd_qty"
+                   name="bd_qty"
+                   class="form-control form-control-sm quantity"
+                   onchange="handleQtyChange(this)"
+                   {% if bill_header.bh_rid %}
+                        readonly
+                    {% endif %}
+                    value="{{ billDetail.bd_qty|default:'' }}">
+        </td>
+
+        <td></td>
+        <td>
+            <input type="number" step="0.01"
+                id="bd_amount"
+                   name="bd_amount"
+                   class="form-control form-control-sm price text-end" 
+                   onchange="calculateBill(this)"
+                   {% if bill_header.bh_rid %}
+                        readonly
+                    {% endif %}
+                    value="{{ billDetail.bd_amount|default:'' }}">
+        </td>
+
+        <td></td>
+        <td>
+            <input type="number" step="0.01"
+                    id="bd_total_amount"
+                   name="bd_total_amount"
+                   class="form-control form-control-sm total text-end"
+                   readonly
+                   tabindex="-1"
+                   value="{{ billDetail.bd_total_amount|default:'' }}">
+        </td>
+        <td></td>
+    </tr>
+    {% endfor %}
+
+</table>

@@ -1,0 +1,162 @@
+<table class="boxShape entryForm" id="accountTable">
+    <!-- HEADER -->
+    <tr class="formHeaderReturnEntry">
+        <td></td>
+        <td colspan="4" style="text-align: left;">
+            Bill Return
+        </td>
+        <td style="text-align: right;">
+            <a href="" class="searchLink">Search..</a>
+        </td>
+        <td></td>
+    </tr>
+
+    <tr class="rowSpacing"><td></td></tr>
+
+    <!-- TYPE + BILL NO -->
+    <tr>
+        <td style="width: 1%;"></td>
+
+        <td style="width: 9%;">Type</td>
+        <td style="width: 50%;">
+            <div style="display:flex; gap:15px; align-items:center;">
+                
+                <label>
+                    <input type="radio" id="sr_customer_sle" name="sr_counter_sale" value="0"
+                        {% if not salereturn_header or salereturn_header.sr_counter_sale == 0 %}checked{% endif %}
+                        {% if salereturn_header and salereturn_header.sr_rid %}
+                            disabled
+                        {% endif %} 
+                        onclick="setSaleType(this.value)">
+                    Account Sale
+                </label>
+
+                <label>
+                    <input type="radio" id="sr_counter_sle" name="sr_counter_sale" value="1"
+                        {% if salereturn_header and salereturn_header.sr_counter_sale == 1 %}checked{% endif %}
+                        {% if salereturn_header and salereturn_header.sr_rid %}
+                            disabled
+                        {% endif %} 
+                        onclick="setSaleType(this.value)">
+                    Cash Party
+                </label>
+
+            </div>
+        </td>
+
+        <td></td>
+
+        <td style="width: 8%;">Bill No</td>
+        <td style="width: 30%;">
+            <input type="text"
+                   name="sr_sale_return_no"
+                   value="{{ salereturn_header.sr_sale_return_no|default:'' }}"
+                   class="form-control form-control-sm"
+                   readonly tabindex="-1">
+        </td>
+
+        <td></td>
+    </tr>
+
+    <!-- ACCOUNT + DATE -->
+    <tr>
+        <td></td>
+
+        <td>Account</td>
+        <td>
+            <table>
+                <tr>
+                    <td style="width: 85%;">
+                        <!-- hidden RID -->
+                        <input type="hidden"
+                            id="sr_acc_rid"
+                            name="sr_acc_rid"
+                            value="{{ salereturn_header.sr_acc_rid|default:'' }}">
+
+                        <!-- visible name -->
+                        <input type="text"
+                            id="sr_acc_name"
+                            name="sr_acc_name"
+                            class="form-control form-control-sm"
+                            value="{{ account.acc_disp_name|default:'' }}"
+                            autocomplete="off"
+                            {% if salereturn_header and salereturn_header.sr_rid %}
+                                readonly
+                            {% endif %}>
+                        <div id="suggestionBox" class="suggestion-box"></div>
+                    </td>
+                    <td style="width: 15%;">
+                        <input type="text"
+                            id="sr_acc_code" name="sr_acc_code"
+                            value="{{ account.acc_code|default:'' }}"
+                            class="form-control form-control-sm"
+                            readonly tabindex="-1">
+                    </td>
+                </tr>
+            </table>
+            
+        </td>
+
+        <td></td>
+
+        <td>Date</td>
+        <td>
+            <input type="date"
+                   name="sr_sale_return_date"
+                   id="sr_sale_return_date"
+                   value="{% if salereturn_header %}{{ salereturn_header.sr_sale_return_date|date:'Y-m-d' }}{% else %}{{ today|date:'Y-m-d' }}{% endif %}"
+                   class="form-control form-control-sm"
+                   {% if salereturn_header and salereturn_header.sr_rid %}
+                                readonly
+                            {% endif %}
+                    tabindex="-1">
+        </td>
+
+        <td></td>
+    </tr>
+
+    <!-- ADDRESS -->
+    <tr id="accountDetailsRow">
+        <td></td>
+
+        <td>Address</td>
+        <td>
+            <input type="text"
+                   id="accountAddress"
+                   name="address"
+                   class="form-control form-control-sm"
+                   value="{{ account.acc_address|default:'' }}"
+                   tabindex="-1" readonly>
+        </td>
+
+        <td></td>
+
+        <td>Phone</td>
+        <td>
+            <input type="text"
+                   id="accountPhone"
+                   name="phone"
+                   class="form-control form-control-sm"
+                   value="{{ account.acc_phone|default:'' }}"
+                   tabindex="-1" readonly>
+        </td>
+    </tr>
+    <!-- NOTES -->
+    <tr>
+        <td></td>
+
+        <td>Notes</td>
+        <td>
+            <input type="text"
+                id="sr_notes" name="sr_notes"
+                class="form-control form-control-sm"
+                value="{{ salereturn_header.sr_notes|default:'' }}"
+                {% if salereturn_header and salereturn_header.sr_rid %}
+                readonly
+                {% endif %}>
+        </td>
+
+        <td></td>
+    </tr>
+
+</table>

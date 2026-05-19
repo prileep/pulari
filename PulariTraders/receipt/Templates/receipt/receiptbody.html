@@ -1,0 +1,153 @@
+<table class="boxShape entryForm" id="ReceiptTable">
+    <tr class="formHeader">
+        <td></td>
+        <td colspan="3" style="text-align:left;">Receipt</td>
+        <td></td>
+    </tr>
+    <tr class="rowSpacing">
+        <td></td>
+    </tr>
+    
+    <tr>
+        <td style="width:1%;"></td>
+        <td style="width:22%;">Receipt Status</td>
+        <td style="width:1%;"></td>
+        <td style="width:75%;">
+            <table style="width:100%;">
+                <tr>
+                    <td style="width:50%;">
+                        <input type="text"
+                               id="rcpt_status"
+                               name="rcpt_status"
+                               value="{{ receipt.rcpt_status }}"
+                               class="form-control form-control-sm"
+                               readonly>
+                    </td>
+
+                    <td style="width:50%;"></td>
+                </tr>
+            </table>
+        </td>
+        <td style="width:1%;"></td>
+    </tr>
+    <tr class="rowSpacing">
+        <td></td>
+    </tr>
+    
+    <tr>
+        <td style="width:1%;"></td>
+        <td style="width:22%;">Receipt No</td>
+        <td style="width:1%;"></td>
+        <td style="width:75%;">
+            <table style="width:100%;">
+                <tr>
+                    <td style="width:50%;">
+                        <input type="text"
+                               id="rcpt_no"
+                               name="rcpt_no"
+                               value="{{ receipt.rcpt_no|default:'' }}"
+                               class="form-control form-control-sm"
+                               readonly>
+                    </td>
+
+                    <td style="width:50%;"></td>
+                </tr>
+            </table>
+        </td>
+        <td style="width:1%;"></td>
+    </tr>
+
+  
+    <tr>
+        <td></td>
+        <td>Receipt Date</td>
+        <td></td>
+        <td>
+            <table style="width:100%;">
+                <tr>
+                    <td style="width:50%;">
+                        <input type="date"
+                               id="rcpt_date"
+                               name="rcpt_date"
+                               value="{% if receipt %}{{ receipt.rcpt_date|date:'Y-m-d' }}{% else %}{{ today|date:'Y-m-d' }}{% endif %}"
+                               class="form-control form-control-sm">
+                    </td>
+
+                    <td style="width:50%;"></td>
+                </tr>
+            </table>
+        </td>
+        <td></td>
+    </tr>
+
+    <tr>
+        <td></td>
+        <td>Account</td>
+        <td></td>
+        <td>
+            <table>
+                <tr>
+                    <td style="width: 90%;">
+                        <!-- hidden RID -->
+                        <input type="hidden"
+                            id="rcpt_acc_rid"
+                            name="rcpt_acc_rid"
+                            value="{{ receipt.rcpt_acc_rid|default:'' }}">
+
+                        <input type="text"
+                            id="rcpt_account_name"
+                            name="rcpt_account_name"
+                            value="{{ account.acc_disp_name|default:'' }}"
+                            class="form-control form-control-sm"
+                            autocomplete="off">
+                        <div id="suggestionBox"
+                            class="suggestion-box">
+                        </div>
+                    </td>
+                    <td style="width: 10%;">
+                        <input type="text"
+                            id="rcpt_account_code" name="rcpt_account_code"
+                            value="{{ account.acc_code|default:'' }}"
+                            class="form-control form-control-sm"
+                            readonly tabindex="-1">
+                    </td>
+                </tr>
+            </table>
+        </td>
+        <td></td>
+    </tr>
+
+    <tr>
+        <td></td>
+        <td>Amount</td>
+        <td></td>
+        <td>
+            <table style="width:100%;">
+                <tr>
+                    <td style="width:50%;">
+                        <input type="number" step="1" step="1" oninput="this.value = this.value.replace(/\D/g, '')"
+                               id="rcpt_amt" name="rcpt_amt"
+                               value="{{ receipt.rcpt_amt|default:'' }}"
+                               class="form-control form-control-sm price text-end">
+                    </td>
+
+                    <td style="width:50%;"></td>
+                </tr>
+            </table>
+        </td>
+        <td></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td>Notes</td>
+        <td></td>
+        <td>
+            <input type="text"
+                   id="rcpt_notes"
+                   name="rcpt_notes"
+                   value="{{ receipt.rcpt_notes|default:'' }}"
+                   class="form-control form-control-sm">
+        </td>
+        <td></td>
+    </tr>
+</table>

@@ -1,0 +1,100 @@
+{% extends 'accounts/base.html' %}
+
+{% block content %}
+
+<table>
+    <tr>
+        <td></td>
+        <td style="text-align: right;">
+            <input type="text"
+                id="accountSearch"
+                class="form-control form-control-sm"
+                placeholder="Search account name...">
+                 
+            </a>
+        </td>
+    <tr class="formHeader">
+        <td style="width: 50%;">
+            Account List
+        </td>
+        <td style="width: 50%; text-align: right;"></td>
+    </tr>
+    <!-- <tr class="rowSpacing"><td></td></tr> -->
+    
+</table>
+
+<div style="max-height: 400px; overflow-y: auto;">
+<table id="accountTable" class="table table-bordered table-sm">
+    <thead>
+        <tr>
+           <th style="width: 150px; white-space: nowrap;">
+    <a href="?sort={% if current_sort == 'acc_code' %}-acc_code{% else %}acc_code{% endif %}" 
+       style="text-decoration: underline;">
+        Account ID ↓
+        {% if current_sort == 'acc_code' %} ↑ {% elif current_sort == '-acc_code' %} ↓ {% endif %}
+    </a>
+</th>
+            <th>
+                <a href="?sort={% if current_sort == 'acc_name' %}-acc_name{% else %}acc_name{% endif %}">
+                    Name ↓
+                    {% if current_sort == 'acc_name' %} ↑ {% elif current_sort == '-acc_name' %} ↓ {% endif %}
+                </a>
+            </th>
+
+            <th>
+                <a href="?sort={% if current_sort == 'acc_place' %}-acc_place{% else %}acc_place{% endif %}">
+                    Place ↓
+                    {% if current_sort == 'acc_place' %} ↑ {% elif current_sort == '-acc_place' %} ↓ {% endif %}
+                </a>
+            </th>
+
+            <th>
+                <a href="?sort={% if current_sort == 'acc_phone' %}-acc_phone{% else %}acc_phone{% endif %}">
+                    Phone ↓
+                    {% if current_sort == 'acc_phone' %} ↑ {% elif current_sort == '-acc_phone' %} ↓ {% endif %}
+                </a>
+            </th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for acc in accounts %}
+        <tr>
+           <td>
+                <a href="{% url 'account' acc.acc_rid %}">
+            {{ acc.acc_code }}
+                </a>
+            </td>
+          <td class="acc-name">{{ acc.acc_name }}</td>
+            <td>{{ acc.acc_place }}</td>
+            <td>{{ acc.acc_phone }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="4" style="text-align:center;">No records found</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+<!-- LIVE SEARCH SCRIPT -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    let searchInput = document.getElementById("accountSearch");
+
+    searchInput.addEventListener("keyup", function () {
+        let filter = this.value.toLowerCase();
+        let rows = document.querySelectorAll("#accountTable tbody tr");
+
+        rows.forEach(function(row) {
+            let name = row.cells[1].textContent.toLowerCase();
+
+            row.style.display = name.includes(filter) ? "" : "none";
+        });
+    });
+
+});
+
+</script>
+{% endblock %}

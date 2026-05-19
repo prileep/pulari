@@ -1,0 +1,113 @@
+{% extends 'accounts/base.html' %}
+
+{% block content %}
+
+<table>
+    <tr>
+        <td></td>
+        <td style="text-align: right; vertical-align: middle;">
+            <input type="text"
+                   id="itemSearch"
+                   class="form-control form-control-sm"
+                   placeholder="Search item name...">
+        </td>
+    </tr>
+
+    <tr class="formHeader">
+        <td style="width: 50%;">
+            Item List
+        </td>
+        <td style="width: 50%; text-align: right;"></td>
+    </tr>
+</table>
+<table id="itemTable" class="table table-bordered table-sm">
+
+    <thead>
+        <tr>
+
+            <!-- ✔ Item Code FIRST (clickable) -->
+            <th>
+                <a href="?sort={% if current_sort == 'code' %}-code{% else %}code{% endif %}">
+                    Code
+                    {% if current_sort == 'code' %} ↑ {% elif current_sort == '-code' %} ↓ {% endif %}
+                </a>
+            </th>
+
+            <th>
+                <a href="?sort={% if current_sort == 'name' %}-name{% else %}name{% endif %}">
+                    Name
+                    {% if current_sort == 'name' %} ↑ {% elif current_sort == '-name' %} ↓ {% endif %}
+                </a>
+            </th>
+
+            <th class="text-center">
+                <a href="?sort={% if current_sort == 'mrp' %}-mrp{% else %}mrp{% endif %}">
+                    MRP
+                    {% if current_sort == 'mrp' %} ↑ {% elif current_sort == '-mrp' %} ↓ {% endif %}
+                </a>
+            </th>
+
+            <th class="text-center">GST</th>
+            <th class="text-center">Sale Price</th>
+             <th class="text-center">Stock</th>
+
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for item in items %}
+        <tr>
+
+            <!-- ✔ CLICKABLE CODE -->
+            <td>
+                <a href="{% url 'item' item.item_rid %}" style="text-decoration:none;">
+            {{ item.item_code }}
+        </a>
+            </td>
+
+            <td class="item-name">{{ item.item_name }}</td>
+
+            <td class="text-end">{{ item.item_mrp|default:"0.00" }}</td>
+            <td class="text-end">{{ item.item_gst|default:"0.00" }}</td>
+            <td class="text-end">{{ item.item_sale_price|default:"0.00" }}</td>
+            <td class="text-end">{{ item.item_stk|default:"0.00" }}</td>
+
+        </tr>
+
+        {% empty %}
+        <tr>
+            <td colspan="5" style="text-align:center;">
+                No records found
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+
+</table>
+</div>
+
+<!-- LIVE SEARCH SCRIPT -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    let searchInput = document.getElementById("itemSearch");
+
+    searchInput.addEventListener("keyup", function () {
+
+        let filter = this.value.toLowerCase();
+        let rows = document.querySelectorAll("#itemTable tbody tr");
+
+        rows.forEach(function(row) {
+
+            let nameCell = row.cells[1];
+            let name = nameCell ? nameCell.textContent.toLowerCase() : "";
+
+            row.style.display = name.includes(filter) ? "" : "none";
+        });
+
+    });
+
+});
+</script>
+
+{% endblock %}

@@ -1,0 +1,196 @@
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white menu-box">
+    <div>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav align-items-center">
+
+                <!-- HOME -->
+                <li class="nav-item">
+                    <a class="nav-link {% if request.path == '/' %}active-menu{% endif %}" href="{% url 'home' %}">
+                        Home
+                    </a>
+                </li>
+
+                <!-- ✅ SEPARATOR -->
+                <li class="nav-item d-flex align-items-center">
+                    <div class="menu-separator"></div>
+                </li>
+
+                <!-- SALE -->
+                <li class="nav-item">
+                    <a class="nav-link 
+                        {% if request.resolver_match.url_name == 'bill' %}
+                        active-menu
+                        {% endif %}"
+                    href="{% url 'bill' %}">
+                        Bill
+                    </a>
+                </li>
+
+                <!-- ✅ SEPARATOR -->
+                <li class="nav-item d-flex align-items-center">
+                    <div class="menu-separator"></div>
+                </li>
+
+                <!-- SALE RETURN -->
+                <li class="nav-item">
+                    <a class="nav-link 
+                        {% if request.resolver_match.url_name == 'salereturn' %}
+                        active-menu
+                        {% endif %}"
+                    href="{% url 'salereturn' %}">
+                        Bill Return
+                    </a>
+                </li>
+
+                <!-- ✅ SEPARATOR -->
+                <li class="nav-item d-flex align-items-center">
+                    <div class="menu-separator"></div>
+                </li>
+
+                <!-- PURCHASE -->
+                <li class="nav-item">
+                    <a class="nav-link 
+                    {% if request.resolver_match.url_name in 'purchase_list add_purchase edit_purchase view_purchase' %}
+                    active-menu
+                    {% endif %}"
+                    href="{% url 'purchase' %}">
+                        Purchase
+                    </a>
+                </li>
+                  <li class="nav-item d-flex align-items-center">
+                    <div class="menu-separator"></div>
+                </li>
+                <!-- PURCHASE RETURN-->
+                <li class="nav-item">
+                    <a class="nav-link 
+                    {% if request.resolver_match.url_name == 'purchasereturn' %}
+                    active-menu
+                    {% endif %}"
+                    href="{% url 'purchasereturn' %}">
+                        Purchase Return
+                    </a>
+                </li>
+                <!-- ✅ SEPARATOR -->
+                <li class="nav-item d-flex align-items-center">
+                    <div class="menu-separator"></div>
+                </li>
+
+                <!-- RECEIPT -->
+                <li class="nav-item">
+                    <a class="nav-link 
+                    {% if request.resolver_match.url_name in 'receipt_list add_receipt edit_receipt view_receipt' %}
+                    active-menu
+                    {% endif %}"
+                    href="{% url 'receipt' %}">
+                        Receipt
+                    </a>
+                </li>
+
+                <!-- ✅ SEPARATOR -->
+                <li class="nav-item d-flex align-items-center">
+                    <div class="menu-separator"></div>
+                </li>
+
+                <!-- TRANSACTION -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                        Transaction
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a class="dropdown-item 
+                                {% if request.resolver_match.url_name in 'transaction_list add_transaction view_transaction' %}
+                                active-menu
+                                {% endif %}"
+                                href="{% url 'transaction_list' %}">
+                                    Credit Note
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item 
+                                {% if request.resolver_match.url_name in 'transaction_list add_transaction view_transaction' %}
+                                active-menu
+                                {% endif %}"
+                                href="{% url 'transaction_list' %}">
+                                    Debit Note
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <!-- ✅ SEPARATOR -->
+                <li class="nav-item d-flex align-items-center">
+                    <div class="menu-separator"></div>
+                </li>
+
+                <!-- ACCOUNT -->
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'account' %}active-menu{% endif %}"
+                       href="{% url 'account' 0 %}">
+                        Account
+                    </a>
+                </li>
+
+                <!-- ✅ SEPARATOR -->
+                <li class="nav-item d-flex align-items-center">
+                    <div class="menu-separator"></div>
+                </li>
+
+                <!-- ITEM -->
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'item' %}active-menu{% endif %}"
+                       href="{% url 'item' 0 %}">
+                        Item
+                    </a>
+                </li>
+
+                <!-- ✅ SEPARATOR -->
+                <li class="nav-item d-flex align-items-center">
+                    <div class="menu-separator"></div>
+                </li>
+
+                <!-- REPORT -->
+                <li class="nav-item">
+                    <a class="nav-link 
+                    {% if request.resolver_match.url_name in 'report_dashboard sales_report purchase_report customer_report' %}
+                    active-menu
+                    {% endif %}"
+                    href="{% url 'report_dashboard' %}">
+                        Report
+                    </a>
+                </li>
+                <!-- ✅ SEPARATOR -->
+                <li class="nav-item d-flex align-items-center">
+                    <div class="menu-separator"></div>
+                </li>
+
+                <!-- RECEIPT -->
+                <li class="nav-item">
+                    <a class="nav-link 
+                    {% if request.resolver_match.url_name == 'transactionbrowser' %}
+                    active-menu
+                    {% endif %}"
+                    href="{% url 'transactionbrowser' %}">
+                        Search
+                    </a>
+                </li>
+                 <li class="nav-item d-flex align-items-center">
+                    <div class="menu-separator"></div>
+                </li>
+
+                 <li class="nav-item">
+                    <a class="nav-link 
+                    {% if request.resolver_match.url_name == 'payment' %}
+                    active-menu
+                    {% endif %}"
+                    href="{% url 'payment' %}">
+                        Payment
+                    </a>
+                </li>
+
+
+            </ul>
+        </div>
+    </div>
+</nav>
