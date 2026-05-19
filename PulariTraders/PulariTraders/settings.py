@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-c1s1cl&l_t@j%is#z9ggpqg4x^*qxxcoos%nara)1jr27-jfw1'
 
-# LOCALHOST
+# # LOCALHOST
 # ALLOWED_HOSTS = []
 # # SECURITY WARNING: don't run with debug turned on in production!
 # DEBUG = True
@@ -44,9 +44,9 @@ SECRET_KEY = 'django-insecure-c1s1cl&l_t@j%is#z9ggpqg4x^*qxxcoos%nara)1jr27-jfw1
 
 
 # DIGITALOCEAN
-ALLOWED_HOSTS = ['206.189.135.106', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['64.227.176.229', 'localhost', '127.0.0.1']
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 DATABASES = {
@@ -55,7 +55,7 @@ DATABASES = {
         'NAME': 'pulari',
         'USER': 'root',
         'PASSWORD': 'PMathan123!',   
-        "HOST": "206.189.135.106",
+        "HOST": "64.227.176.229",
         "PORT": "3306",
     }
 }
