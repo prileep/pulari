@@ -156,5 +156,5 @@ USE_TZ = True
 
 
 STATICFILES_DIRS = [
-    BASE_DIR / "Static",   # matches your folder name
+    BASE_DIR / "static",   # matches your folder name
 ]
