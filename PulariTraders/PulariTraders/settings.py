@@ -24,29 +24,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-c1s1cl&l_t@j%is#z9ggpqg4x^*qxxcoos%nara)1jr27-jfw1'
 
 # LOCALHOST
-# ALLOWED_HOSTS = []
-# # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = True
-# # Database
-# # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'pulari',
-#         'USER': 'root',
-#         'PASSWORD': 'root',   
-#         "HOST": "127.0.0.1",
-#         "PORT": "3306",
-#     }
-# }
-# STATIC_URL = '/static/'
-# STATIC_ROOT = BASE_DIR / "staticfiles"
-
-
-# DIGITALOCEAN
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+ALLOWED_HOSTS = []
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 DATABASES = {
@@ -54,18 +34,34 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'pulari',
         'USER': 'root',
-        'PASSWORD': 'PMathan123!',   
-        "HOST": "206.189.135.106",
+        'PASSWORD': 'root',   
+        "HOST": "127.0.0.1",
         "PORT": "3306",
     }
 }
-# Static and Media Files configuration
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 
-
-
+# # DIGITALOCEAN
+# ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+# # SECURITY WARNING: don't run with debug turned on in production!
+# DEBUG = False
+# # Database
+# # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'pulari',
+#         'USER': 'root',
+#         'PASSWORD': 'PMathan123!',   
+#         "HOST": "206.189.135.106",
+#         "PORT": "3306",
+#     }
+# }
+# # Static and Media Files configuration
+# STATIC_URL = '/static/'
+# STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Application definition
 INSTALLED_APPS = [
