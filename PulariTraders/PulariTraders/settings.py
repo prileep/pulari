@@ -44,7 +44,7 @@ SECRET_KEY = 'django-insecure-c1s1cl&l_t@j%is#z9ggpqg4x^*qxxcoos%nara)1jr27-jfw1
 
 
 # DIGITALOCEAN
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['206.189.135.106', 'localhost', '127.0.0.1']
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 # Database
