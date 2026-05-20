@@ -105,8 +105,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
                         getInputFromRowById(newRow, 'tdDate').innerHTML = item.acctran_date;
                         getInputFromRowById(newRow, 'tdAccount').innerHTML = item.acc_name;
+
                         getInputFromRowById(newRow, 'tdType').innerHTML = item.acctran_ref_type;
-                        getInputFromRowById(newRow, 'tdType').href = `/${item.acctran_ref_type}/${item.acctran_ref_rid}/`;
+                        getInputFromRowById(newRow, 'tdType').href = `/${item.acctran_ref_type.toLowerCase()}/${item.acctran_ref_rid}/`;
 
                         const bullet = '\u2022';
                         getInputFromRowById(newRow, 'tdNotes').innerHTML = item.acc_notes.replaceAll(` ${bullet} `, ` ${bullet} <wbr> `);
