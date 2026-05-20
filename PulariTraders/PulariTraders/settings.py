@@ -144,11 +144,8 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
 
 USE_I18N = True
-
-USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
@@ -159,3 +156,7 @@ USE_TZ = True
 STATICFILES_DIRS = [
     BASE_DIR / "static",   # matches your folder name
 ]
+
+# Open your project settings.py and modify these lines:
+TIME_ZONE = 'Asia/Kolkata'
+USE_TZ = True
