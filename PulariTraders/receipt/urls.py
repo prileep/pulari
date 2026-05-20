@@ -20,5 +20,8 @@ from django.contrib import admin
 from django.urls import path,include
 from . import views
 urlpatterns = [
-   path('',views.receipt,name='receipt'),
+
+    path('', views.receipt, name='receipt'),
+    path('<int:rid>/', views.receipt, name='rid'),
+    
 ]

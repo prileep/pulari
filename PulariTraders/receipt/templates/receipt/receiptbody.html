@@ -23,8 +23,12 @@
                                class="form-control form-control-sm"
                                readonly>
                     </td>
-
-                    <td style="width:50%;"></td>
+                    <td style="width:1%;"></td>
+                    <td style="width:49%;">
+                        {% if receipt.rcpt_rid and receipt.rcpt_status == 'Cancelled' %}
+                            <div class="cancelledTransaction">The Receipt is cancelled.</div>
+                        {% endif %}
+                    </td>
                 </tr>
             </table>
         </td>
@@ -70,7 +74,8 @@
                                id="rcpt_date"
                                name="rcpt_date"
                                value="{% if receipt %}{{ receipt.rcpt_date|date:'Y-m-d' }}{% else %}{{ today|date:'Y-m-d' }}{% endif %}"
-                               class="form-control form-control-sm">
+                               class="form-control form-control-sm"
+                               {% if receipt.rcpt_rid %} readonly {% endif %}>
                     </td>
 
                     <td style="width:50%;"></td>
@@ -99,7 +104,8 @@
                             name="rcpt_account_name"
                             value="{{ account.acc_disp_name|default:'' }}"
                             class="form-control form-control-sm"
-                            autocomplete="off">
+                            autocomplete="off"
+                            {% if receipt.rcpt_rid %} readonly {% endif %}>
                         <div id="suggestionBox"
                             class="suggestion-box">
                         </div>
@@ -128,7 +134,8 @@
                         <input type="number" step="1" step="1" oninput="this.value = this.value.replace(/\D/g, '')"
                                id="rcpt_amt" name="rcpt_amt"
                                value="{{ receipt.rcpt_amt|default:'' }}"
-                               class="form-control form-control-sm price text-end">
+                               class="form-control form-control-sm price text-end"
+                               {% if receipt.rcpt_rid %} readonly {% endif %}>
                     </td>
 
                     <td style="width:50%;"></td>
@@ -146,7 +153,8 @@
                    id="rcpt_notes"
                    name="rcpt_notes"
                    value="{{ receipt.rcpt_notes|default:'' }}"
-                   class="form-control form-control-sm">
+                   class="form-control form-control-sm"
+                   {% if receipt.rcpt_rid %} readonly {% endif %}>
         </td>
         <td></td>
     </tr>

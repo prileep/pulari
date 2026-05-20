@@ -18,11 +18,7 @@
 
                 <!-- SALE -->
                 <li class="nav-item">
-                    <a class="nav-link 
-                        {% if request.resolver_match.url_name == 'bill' %}
-                        active-menu
-                        {% endif %}"
-                    href="{% url 'bill' %}">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'bill' %}active-menu{% endif %}" href="{% url 'bill' %}">
                         Bill
                     </a>
                 </li>
@@ -34,11 +30,7 @@
 
                 <!-- SALE RETURN -->
                 <li class="nav-item">
-                    <a class="nav-link 
-                        {% if request.resolver_match.url_name == 'salereturn' %}
-                        active-menu
-                        {% endif %}"
-                    href="{% url 'salereturn' %}">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'salereturn' %}active-menu{% endif %}" href="{% url 'billreturn' %}">
                         Bill Return
                     </a>
                 </li>
@@ -50,27 +42,23 @@
 
                 <!-- PURCHASE -->
                 <li class="nav-item">
-                    <a class="nav-link 
-                    {% if request.resolver_match.url_name in 'purchase_list add_purchase edit_purchase view_purchase' %}
-                    active-menu
-                    {% endif %}"
-                    href="{% url 'purchase' %}">
+                    <a class="nav-link {% if request.resolver_match.url_name in 'purchase_list add_purchase edit_purchase view_purchase' %}active-menu{% endif %}" href="{% url 'purchase' %}">
                         Purchase
                     </a>
                 </li>
-                  <li class="nav-item d-flex align-items-center">
+
+                <!-- ✅ SEPARATOR -->
+                <li class="nav-item d-flex align-items-center">
                     <div class="menu-separator"></div>
                 </li>
+
                 <!-- PURCHASE RETURN-->
                 <li class="nav-item">
-                    <a class="nav-link 
-                    {% if request.resolver_match.url_name == 'purchasereturn' %}
-                    active-menu
-                    {% endif %}"
-                    href="{% url 'purchasereturn' %}">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'purchasereturn' %}active-menu{% endif %}" href="{% url 'purchasereturn' %}">
                         Purchase Return
                     </a>
                 </li>
+
                 <!-- ✅ SEPARATOR -->
                 <li class="nav-item d-flex align-items-center">
                     <div class="menu-separator"></div>
@@ -78,45 +66,16 @@
 
                 <!-- RECEIPT -->
                 <li class="nav-item">
-                    <a class="nav-link 
-                    {% if request.resolver_match.url_name in 'receipt_list add_receipt edit_receipt view_receipt' %}
-                    active-menu
-                    {% endif %}"
-                    href="{% url 'receipt' %}">
+                    <a class="nav-link {% if request.resolver_match.url_name in 'receipt_list add_receipt edit_receipt view_receipt' %}active-menu{% endif %}" href="{% url 'receipt' %}">
                         Receipt
                     </a>
                 </li>
 
-                <!-- ✅ SEPARATOR -->
-                <li class="nav-item d-flex align-items-center">
-                    <div class="menu-separator"></div>
-                </li>
-
-                <!-- TRANSACTION -->
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
-                        Transaction
+                <!-- DISCOUNT -->
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name in 'discount_list add_discount edit_discount view_discount' %}active-menu{% endif %}" href="{% url 'discount' %}">
+                        Discount
                     </a>
-                    <ul class="dropdown-menu">
-                        <li>
-                            <a class="dropdown-item 
-                                {% if request.resolver_match.url_name in 'transaction_list add_transaction view_transaction' %}
-                                active-menu
-                                {% endif %}"
-                                href="{% url 'transaction_list' %}">
-                                    Credit Note
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item 
-                                {% if request.resolver_match.url_name in 'transaction_list add_transaction view_transaction' %}
-                                active-menu
-                                {% endif %}"
-                                href="{% url 'transaction_list' %}">
-                                    Debit Note
-                            </a>
-                        </li>
-                    </ul>
                 </li>
 
                 <!-- ✅ SEPARATOR -->
@@ -126,8 +85,7 @@
 
                 <!-- ACCOUNT -->
                 <li class="nav-item">
-                    <a class="nav-link {% if request.resolver_match.url_name == 'account' %}active-menu{% endif %}"
-                       href="{% url 'account' 0 %}">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'account' %}active-menu{% endif %}" href="{% url 'account' 0 %}">
                         Account
                     </a>
                 </li>
@@ -139,8 +97,7 @@
 
                 <!-- ITEM -->
                 <li class="nav-item">
-                    <a class="nav-link {% if request.resolver_match.url_name == 'item' %}active-menu{% endif %}"
-                       href="{% url 'item' 0 %}">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'item' %}active-menu{% endif %}" href="{% url 'item' 0 %}">
                         Item
                     </a>
                 </li>
@@ -152,43 +109,34 @@
 
                 <!-- REPORT -->
                 <li class="nav-item">
-                    <a class="nav-link 
-                    {% if request.resolver_match.url_name in 'report_dashboard sales_report purchase_report customer_report' %}
-                    active-menu
-                    {% endif %}"
-                    href="{% url 'report_dashboard' %}">
+                    <a class="nav-link {% if request.resolver_match.url_name in 'report_dashboard sales_report purchase_report customer_report' %}active-menu{% endif %}" href="{% url 'report_dashboard' %}">
                         Report
                     </a>
                 </li>
+
                 <!-- ✅ SEPARATOR -->
                 <li class="nav-item d-flex align-items-center">
                     <div class="menu-separator"></div>
                 </li>
 
-                <!-- RECEIPT -->
+                <!-- SEARCH -->
                 <li class="nav-item">
-                    <a class="nav-link 
-                    {% if request.resolver_match.url_name == 'transactionbrowser' %}
-                    active-menu
-                    {% endif %}"
-                    href="{% url 'transactionbrowser' %}">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'transactionbrowser' %}active-menu{% endif %}" href="{% url 'transactionbrowser' %}">
                         Search
                     </a>
                 </li>
-                 <li class="nav-item d-flex align-items-center">
+
+                <!-- ✅ SEPARATOR -->
+                <li class="nav-item d-flex align-items-center">
                     <div class="menu-separator"></div>
                 </li>
 
-                 <li class="nav-item">
-                    <a class="nav-link 
-                    {% if request.resolver_match.url_name == 'payment' %}
-                    active-menu
-                    {% endif %}"
-                    href="{% url 'payment' %}">
+                <!-- PAYMENT -->
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'payment' %}active-menu{% endif %}" href="{% url 'payment' %}">
                         Payment
                     </a>
                 </li>
-
 
             </ul>
         </div>

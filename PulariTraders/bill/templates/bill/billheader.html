@@ -157,6 +157,11 @@
         </td>
 
         <td></td>
+        <td colspan="3">
+            {% if bill_header.bh_rid and bill_header.bh_status == 'Cancelled' %}
+                <div class="cancelledTransaction">The Bill is cancelled.</div>
+            {% endif %}
+        </td>
     </tr>
 
 </table>

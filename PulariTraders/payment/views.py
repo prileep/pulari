@@ -27,11 +27,15 @@ def payment(request):
     # ================= CANCEL BILL =================
     if request.method == "POST" and request.POST.get("action") == "cancel":
 
-        pay_rid = request.POST.get("pay_rid")
+        with transaction.atomic():
 
-        Payment.objects.filter(pay_rid=pay_rid).update(
-            pay_status="Cancelled"
-        )
+            pay_rid = request.POST.get("pay_rid")
+
+            Payment.objects.filter(pay_rid=pay_rid).update(
+                pay_status="Cancelled"
+            )
+            with connection.cursor() as cursor:
+                cursor.callproc('post_payment', [payment.pay_rid])
 
         messages.success(request, "Payment cancelled successfully ❌")
 

@@ -28,7 +28,7 @@
             <td></td>
             <td>Account ID</td>
             <td>
-              <input type="text" name="acc_code" value="{{ account.acc_code|default:next_id }}"
+              <input type="text" name="acc_code" value="{{ account.acc_code }}"
                 style="width: 30%;"
                 class="form-control form-control-sm" readonly>
        
@@ -41,7 +41,7 @@
             <td>Name*</td>
             <td>
                 <input type="text" name="acc_name" value="{{ account.acc_name }}"
-                       class="form-control form-control-sm" autocomplete="new-password">
+                       class="form-control form-control-sm text-uppercase" autocomplete="new-password">
             </td>
             <td></td>
         </tr>
@@ -51,7 +51,7 @@
             <td>Place</td>
             <td>
                 <input type="text" name="acc_place" value="{{ account.acc_place }}"
-                       class="form-control form-control-sm" autocomplete="new-password">
+                       class="form-control form-control-sm text-uppercase" autocomplete="new-password">
             </td>
             <td></td>
         </tr>

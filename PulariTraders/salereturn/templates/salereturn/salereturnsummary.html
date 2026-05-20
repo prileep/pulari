@@ -12,7 +12,7 @@
           id="sr_amount"
           name="sr_amount"
 
-          value="{{ salereturn_header.sr_amount|default:''}}"
+          value="{{ sale_return_header.sr_amount|default:''}}"
           class="form-control form-control-sm price text-end"
           readonly tabindex="-1">
           </td>
@@ -29,7 +29,7 @@
           <input type="number" step="0.01"
           id="sr_discount" name="sr_discount"
 
-          value="{{ salereturn_header.sr_discount|default:''}}"
+          value="{{ sale_return_header.sr_discount|default:''}}"
           class="form-control form-control-sm price text-end" readonly tabindex="-1">
           </td>
         <td></td>
@@ -48,11 +48,11 @@
             id="sr_net_amount"
             name="sr_net_amount"
 
-            value="{{ salereturn_header.sr_net_amount|default:''}}"
+            value="{{ sale_return_header.sr_net_amount|default:''}}"
             class="form-control form-control-sm price text-end"
             onchange="adjustAmount()"
             tabindex="-1"
-            {% if salereturn_header.sr_sale_return_no %}
+            {% if sale_return_header.sr_sale_return_no %}
               readonly
             {% endif%}
             >
@@ -66,16 +66,22 @@
     <td></td>
     <td style="width: 1%;"></td>
     <td style="width: 14%;">
-      {% if salereturn_header.sr_rid and salereturn_header.sr_status != 'Cancelled' %}
-        <a href="/salereturn?cancel=1&sr_rid={{ salereturn_header.sr_rid }}"
-          class="searchLink"
-          onclick="return confirm('Are you sure to cancel this salereturn?');">
-          Cancel this salereturn
-        </a>
-        {% endif %}
+      {% if sale_return_header.sr_rid and sale_return_header.sr_status != 'Cancelled' %}
+        <input type="hidden" name="rid" value="{{ sale_return_header.sr_rid }}">
+
+        <button type="submit" 
+                name="action" 
+                value="cancel"
+                formaction="/billreturn/"
+                class="searchLink"
+                style="background: none; border: none; padding: 0; cursor: pointer;"
+                onclick="return confirm('Are you sure to cancel this Bill Return?');">
+          Cancel this Bill Return
+        </button>
+      {% endif %}
     </td>
     <td style="text-align: right; width: 84%;">
-      {% if salereturn_header.sr_rid %}
+      {% if sale_return_header.sr_rid %}
         
       {% else %}
         <button type="submit" class="submitButton">Submit</button>&nbsp;

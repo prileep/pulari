@@ -44,6 +44,9 @@ urlpatterns = [
     path('receipt/',include('receipt.urls')),
     path('Receipt/',include('receipt.urls')),   # optional alias
 
+    path('discount/',include('discount.urls')),
+    path('Discount/',include('discount.urls')),   # optional alias
+
     path('payment/',include('payment.urls')),
     path('Payment/',include('payment.urls')),   # optional alias
         

@@ -59,11 +59,17 @@ def bill(request, rid=None):
     # ================= CANCEL BILL =================
     if request.method == "POST" and request.POST.get("action") == "cancel":
 
-        rid = request.POST.get("rid")
+        with transaction.atomic():
+            
+            rid = request.POST.get("rid")
+            bill_header = BillHeader.objects.filter(bh_rid=rid).first()
 
-        BillHeader.objects.filter(bh_rid=rid).update(
-            bh_status="Cancelled"
-        )
+            if bill_header: # Good practice to check for None
+                bill_header.bh_status = "Cancelled"
+                bill_header.save() # This works!
+
+                with connection.cursor() as cursor:
+                        cursor.callproc('post_bill', [bill_header.bh_rid])
 
         messages.success(request, "Bill cancelled successfully ❌")
 

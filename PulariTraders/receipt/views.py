@@ -17,9 +17,10 @@ def get_next_receipt_no():
     return row[0]
 
 
-def receipt(request):
+def receipt(request, rid=None):
 
-    rcpt_rid = request.GET.get("rcpt_rid")
+    if not rid:
+        rid = request.GET.get("rid");
 
     receipt = None
     account = None
@@ -27,19 +28,24 @@ def receipt(request):
     # ================= CANCEL BILL =================
     if request.method == "POST" and request.POST.get("action") == "cancel":
 
-        rcpt_rid = request.POST.get("rcpt_rid")
+        with transaction.atomic():
 
-        Receipt.objects.filter(rcpt_rid=rcpt_rid).update(
-            rcpt_status="Cancelled"
-        )
+            rid = request.POST.get("rid")
+
+            Receipt.objects.filter(rcpt_rid=rid).update(
+                rcpt_status="Cancelled"
+            )
+
+            with connection.cursor() as cursor:
+                cursor.callproc('post_receipt', [receipt.rcpt_rid])
 
         messages.success(request, "Receipt cancelled successfully ❌")
 
-        return redirect(f"/receipt?rcpt_rid={rcpt_rid}")
+        return redirect(f"/receipt/{rid}/")
 
     # ================= LOAD BILL =================
-    if rcpt_rid:
-        receipt = Receipt.objects.filter(rcpt_rid=rcpt_rid).first()
+    if rid:
+        receipt = Receipt.objects.filter(rcpt_rid=rid).first()
 
         if receipt:
             account = Account.objects.get(acc_rid=receipt.rcpt_acc_rid)
@@ -73,7 +79,7 @@ def receipt(request):
 
         messages.success(request, f"Receipt {receipt.rcpt_no} saved successfully ✅")
 
-        return redirect(f"/receipt?rcpt_rid={receipt.rcpt_rid}")
+        return redirect(f"/receipt/{receipt.rcpt_rid}/")
 
     return render(request, 'receipt/receipt.html', {
         'accounts': list(accounts),

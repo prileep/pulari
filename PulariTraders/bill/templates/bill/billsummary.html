@@ -67,12 +67,18 @@
     <td style="width: 1%;"></td>
     <td style="width: 14%;">
       {% if bill_header.bh_rid and bill_header.bh_status != 'Cancelled' %}
-        <a href="/bill?cancel=1&bh_rid={{ bill_header.bh_rid }}"
-          class="searchLink"
-          onclick="return confirm('Are you sure to cancel this bill?');">
+        <input type="hidden" name="rid" value="{{ bill_header.bh_rid }}">
+
+        <button type="submit" 
+                name="action" 
+                value="cancel"
+                formaction="/bill/"
+                class="searchLink"
+                style="background: none; border: none; padding: 0; cursor: pointer;"
+                onclick="return confirm('Are you sure to cancel this bill?');">
           Cancel this bill
-        </a>
-        {% endif %}
+        </button>
+      {% endif %}
     </td>
     <td style="text-align: right; width: 84%;">
       {% if bill_header.bh_rid %}
@@ -88,3 +94,4 @@
     <td style="width: 1%;"></td>
   </tr>
 </table>
+

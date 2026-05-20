@@ -1,0 +1,157 @@
+<table class="boxShape entryForm" id="DiscountTable">
+    <tr class="formHeader">
+        <td></td>
+        <td colspan="3" style="text-align:left;">Discount</td>
+        <td></td>
+    </tr>
+    <tr class="rowSpacing">
+        <td></td>
+    </tr>
+    
+    <tr>
+        <td style="width:1%;"></td>
+        <td style="width:22%;">Discount Status</td>
+        <td style="width:1%;"></td>
+        <td style="width:75%;">
+            <table style="width:100%;">
+                <tr>
+                    <td style="width:50%;">
+                        <input type="text"
+                               id="disc_status"
+                               name="disc_status"
+                               value="{{ discount.disc_status }}"
+                               class="form-control form-control-sm"
+                               readonly>
+                    </td>
+
+                    <td style="width:50%;"></td>
+                </tr>
+            </table>
+        </td>
+        <td style="width:1%;"></td>
+    </tr>
+    <tr class="rowSpacing">
+        <td></td>
+    </tr>
+    
+    <tr>
+        <td style="width:1%;"></td>
+        <td style="width:22%;">Discount No</td>
+        <td style="width:1%;"></td>
+        <td style="width:75%;">
+            <table style="width:100%;">
+                <tr>
+                    <td style="width:50%;">
+                        <input type="text"
+                               id="disc_no"
+                               name="disc_no"
+                               value="{{ discount.disc_no|default:'' }}"
+                               class="form-control form-control-sm"
+                               readonly>
+                    </td>
+
+                    <td style="width:50%;"></td>
+                </tr>
+            </table>
+        </td>
+        <td style="width:1%;"></td>
+    </tr>
+
+  
+    <tr>
+        <td></td>
+        <td>Discount Date</td>
+        <td></td>
+        <td>
+            <table style="width:100%;">
+                <tr>
+                    <td style="width:50%;">
+                        <input type="date"
+                               id="disc_date"
+                               name="disc_date"
+                               value="{% if discount %}{{ discount.disc_date|date:'Y-m-d' }}{% else %}{{ today|date:'Y-m-d' }}{% endif %}"
+                               {% if discount.disc_rid %} readonly {% endif %}
+                               class="form-control form-control-sm">
+                    </td>
+
+                    <td style="width:50%;"></td>
+                </tr>
+            </table>
+        </td>
+        <td></td>
+    </tr>
+
+    <tr>
+        <td></td>
+        <td>Account</td>
+        <td></td>
+        <td>
+            <table>
+                <tr>
+                    <td style="width: 90%;">
+                        <!-- hidden RID -->
+                        <input type="hidden"
+                            id="disc_acc_rid"
+                            name="disc_acc_rid"
+                            value="{{ discount.disc_acc_rid|default:'' }}">
+
+                        <input type="text"
+                            id="disc_account_name"
+                            name="disc_account_name"
+                            value="{{ account.acc_disp_name|default:'' }}"
+                            class="form-control form-control-sm"
+                            autocomplete="off"
+                            {% if discount.disc_rid %} readonly {% endif %}>
+                        <div id="suggestionBox"
+                            class="suggestion-box">
+                        </div>
+                    </td>
+                    <td style="width: 10%;">
+                        <input type="text"
+                            id="disc_account_code" name="disc_account_code"
+                            value="{{ account.acc_code|default:'' }}"
+                            class="form-control form-control-sm"
+                            readonly tabindex="-1">
+                    </td>
+                </tr>
+            </table>
+        </td>
+        <td></td>
+    </tr>
+
+    <tr>
+        <td></td>
+        <td>Amount</td>
+        <td></td>
+        <td>
+            <table style="width:100%;">
+                <tr>
+                    <td style="width:50%;">
+                        <input type="number" step="1" step="1" oninput="this.value = this.value.replace(/\D/g, '')"
+                               id="disc_amt" name="disc_amt"
+                               value="{{ discount.disc_amt|default:'' }}"
+                               class="form-control form-control-sm price text-end"
+                               {% if discount.disc_rid %} readonly {% endif %}>
+                    </td>
+
+                    <td style="width:50%;"></td>
+                </tr>
+            </table>
+        </td>
+        <td></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td>Notes</td>
+        <td></td>
+        <td>
+            <input type="text"
+                   id="disc_notes"
+                   name="disc_notes"
+                   value="{{ discount.disc_notes|default:'' }}"
+                   class="form-control form-control-sm"
+                   {% if discount.disc_rid %} readonly {% endif %}>
+        </td>
+        <td></td>
+    </tr>
+</table>

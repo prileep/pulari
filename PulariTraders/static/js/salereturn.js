@@ -57,7 +57,7 @@ function setReadonlyState(isReadonly) {
 function handleQtyChange(el) {
 
     cloneItemRow(el);
-    calculateSaleReturn()
+    calculateSaleReturn();
 }
 
 function cloneItemRow(el) {
@@ -90,7 +90,7 @@ function initSaleReturnItem(itemInput) {
         //srd_amount
         let row = thGetRow(itemInput);
 
-        getInputFromRowById(row, "srd_amount").value = parseFloat(c.item_sale_price || 0).toFixed(2);
+        getInputFromRowById(row, "srd_amount").placeholder = parseFloat(c.item_sale_price || 0).toFixed(2);
         getInputFromRowById(row, "item_stk").value = parseFloat(c.item_stk || 0).toFixed(2);
 
         getInputFromRowById(row, "srd_item_rid").value = c.item_rid;

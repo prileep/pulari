@@ -27,14 +27,37 @@
         <tr>
             <td>
                 <table>
-                    <tr class="rowSpacing"><td></td></tr>
+                    <tr class="rowSpacing">
+                        <td style="width: 20%;"></td>
+                        <td style="width: 80%;"></td>
+                    </tr>
                     <tr>
+                        <td>
+                            {% if receipt.rcpt_rid and receipt.rcpt_status != 'Cancelled' %}
+                                <input type="hidden" name="rid" value="{{ receipt.rcpt_rid }}">
+
+                                <button type="submit" 
+                                        name="action" 
+                                        value="cancel"
+                                        formaction="/receipt/"
+                                        class="searchLink"
+                                        style="background: none; border: none; padding: 0; cursor: pointer;"
+                                        onclick="return confirm('Are you sure to cancel this receipt?');">
+                                Cancel this receipt
+                                </button>
+                            {% endif %}
+                        </td>
                         <td style="text-align: right;">
-                                
-                            <td style="text-align: right;">
-                                <button type="submit" class="submitButton">Save</button>&nbsp;
-                                <button type="button" onclick="window.location.href='/receipt'" class="submitButton">Clear</button>
-                            </td>
+                            {% if receipt.rcpt_rid %}
+                                <button type="button" class="submitButton"
+                                data-rid="{{ receipt.rcpt_rid }}"
+                                onclick="openPrintBill(this.dataset.rid)">Print</button>&nbsp;
+                            {% else %}
+                                <button type="submit" class="submitButton">Submit</button>&nbsp;
+                            {% endif %}
+
+                            <button type="button" onclick="window.location.href='/receipt'" class="submitButton">Clear</button>
+                        </td>
                     </tr>
                 </table>
             </td>

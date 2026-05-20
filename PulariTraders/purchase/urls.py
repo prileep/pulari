@@ -20,7 +20,6 @@ from django.contrib import admin
 from django.urls import path,include
 
 urlpatterns = [
-     path('',views.purchase,name='purchase')
-    
-
+    path('', views.purchase, name='purchase'),
+    path('<int:rid>/', views.purchase, name='rid'),
 ]

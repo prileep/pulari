@@ -38,6 +38,31 @@
             margin-top: 4px;
         }
 
+        /* Top Right Vertical Summary Card Styles */
+        .top-summary-table {
+            width: 240px;
+            font-size: 12px;
+        }
+        
+        .top-summary-table th, 
+        .top-summary-table td {
+            padding: 4px 10px;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .top-summary-table th {
+            background: #f8f9fa;
+            font-weight: normal;
+            color: #555;
+            text-align: left;
+            width: 50%;
+        }
+
+        .top-summary-table td {
+            text-align: right;
+            font-weight: bold;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -75,13 +100,6 @@
             background: #fafafa;
         }
 
-        .summary-label-row td {
-            font-style: italic;
-            color: grey;
-            background: #fff;
-            font-weight: normal;
-        }
-
         @media print {
 
             body {
@@ -104,12 +122,41 @@
     <div class="header">
 
         <div>
-            <h2 id="reportTitle">Balance Sheet</h2>
+            <!-- Hardcoded text element adjusted to uppercase requested string -->
+            <h2>BALANCE SHEET</h2>
+            <div id="accountNameDisplay" style="font-size: 15px; font-weight: bold; margin-top: 4px;"></div>
+            
+            <!-- Date Range Display Container Element -->
+            <div id="dateRangeDisplay" class="muted" style="font-weight: bold; margin-bottom: 2px;"></div>
 
             <div class="muted">
                 Generated on:
                 <span id="generatedOn"></span>
             </div>
+        </div>
+
+        <!-- Top Right Row-Based Summary Table -->
+        <div>
+            <table class="top-summary-table">
+                <tbody>
+                    <tr>
+                        <th>Opening Balance</th>
+                        <td id="topOpening">-</td>
+                    </tr>
+                    <tr>
+                        <th>Cash In</th>
+                        <td id="topCashIn">-</td>
+                    </tr>
+                    <tr>
+                        <th>Cash Out</th>
+                        <td id="topClosingOut">-</td>
+                    </tr>
+                    <tr style="background: #fafafa;">
+                        <th>Closing Balance</th>
+                        <td id="topClosing">-</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
 
     </div>
@@ -157,6 +204,16 @@ function formatIndianCurrency(value) {
 
 }
 
+// Helper Function to cleanly switch YYYY-MM-DD into DD-MM-YYYY
+function formatToIndianDate(dateStr) {
+    if (!dateStr) return "-";
+    const parts = dateStr.split("-");
+    if (parts.length === 3 && parts[0].length === 4) {
+        return `${parts[2]}-${parts[1]}-${parts[0]}`;
+    }
+    return dateStr;
+}
+
 function getParams() {
 
     return new URLSearchParams(window.location.search);
@@ -171,15 +228,19 @@ async function loadReport() {
     const fromDate = params.get("from_date") || "";
     const toDate = params.get("to_date") || "";
 
-    let title = account;
+    // Placed Account identifier string into its own descriptive element layer underneath main title
+    document.getElementById("accountNameDisplay").innerHTML = account;
 
+    // Handle the Date Range dynamic string formatting logic
+    const rangeContainer = document.getElementById("dateRangeDisplay");
     if (fromDate || toDate) {
-
-        title += ` (${fromDate} to ${toDate})`;
-
+        const formattedFrom = formatToIndianDate(fromDate);
+        const formattedTo = formatToIndianDate(toDate);
+        rangeContainer.innerHTML = `Date Range: ${formattedFrom} - ${formattedTo}`;
+        rangeContainer.style.display = "block";
+    } else {
+        rangeContainer.style.display = "none";
     }
-
-    document.getElementById("reportTitle").innerHTML = title;
 
     document.getElementById("generatedOn").innerHTML =
         new Date().toLocaleString();
@@ -228,9 +289,32 @@ async function loadReport() {
         let totCashOut = 0;
         let lastItem = null;
 
-        data.transactions.forEach(item => {
+        data.transactions.forEach((item, index) => {
 
             lastItem = item;
+
+            // Insert the extra opening row immediately if this was the first item
+            if (index === 0) {
+                rows.push(`
+                    <tr>
+
+                        <td class="center"></td>
+
+                        <td class="nowrap"></td>
+
+                        <td class="num">(Opening)</td>
+
+                        <td class="num"></td>
+
+                        <td class="num"></td>
+
+                        <td class="num">
+                            ${formatIndianCurrency(item.open_balance)}
+                        </td>
+
+                    </tr>
+                `);
+            }
 
             totCashIn += Number(item.cr_amt || 0);
             totCashOut += Number(item.dr_amt || 0);
@@ -248,7 +332,7 @@ async function loadReport() {
                     </td>
 
                     <td class="nowrap">
-                        ${item.acctran_date || ""}
+                        ${formatToIndianDate(item.acctran_date)}
                     </td>
 
                     <td>
@@ -307,33 +391,13 @@ async function loadReport() {
 
         `);
 
-        rows.push(`
-
-            <tr class="summary-label-row">
-
-                <td colspan="2"></td>
-
-                <td class="num">
-                    (Opening)
-                </td>
-
-                <td class="num">
-                    (Cash In)
-                </td>
-
-                <td class="num">
-                    (Cash Out)
-                </td>
-
-                <td class="num">
-                    (Closing)
-                </td>
-
-            </tr>
-
-        `);
-
         body.innerHTML = rows.join("");
+
+        // Populate the summary card records
+        document.getElementById("topOpening").innerHTML = formatIndianCurrency(data.transactions[0].open_balance);
+        document.getElementById("topCashIn").innerHTML  = formatIndianCurrency(totCashIn);
+        document.getElementById("topClosingOut").innerHTML = formatIndianCurrency(totCashOut);
+        document.getElementById("topClosing").innerHTML = formatIndianCurrency(lastItem.balance);
 
     }
     catch (err) {

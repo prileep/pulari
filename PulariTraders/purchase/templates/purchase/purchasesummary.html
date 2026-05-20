@@ -65,16 +65,22 @@
   <tr>
     <td></td>
     <td style="width: 1%;"></td>
-    <td style="width: 14%;">
+    <td style="width: 20%;">
       {% if purchase_header.ph_rid and purchase_header.ph_status != 'Cancelled' %}
-        <a href="/purchase?cancel=1&ph_rid={{ purchase_header.ph_rid }}"
-          class="searchLink"
-          onclick="return confirm('Are you sure to cancel this purchase?');">
+        <input type="hidden" name="rid" value="{{ purchase_header.ph_rid }}">
+
+        <button type="submit" 
+                name="action" 
+                value="cancel"
+                formaction="/purchase/"
+                class="searchLink"
+                style="background: none; border: none; padding: 0; cursor: pointer;"
+                onclick="return confirm('Are you sure to cancel this purchase?');">
           Cancel this purchase
-        </a>
-        {% endif %}
+        </button>
+      {% endif %}
     </td>
-    <td style="text-align: right; width: 84%;">
+    <td style="text-align: right; width: 78%;">
       {% if purchase_header.ph_rid %}
         
       {% else %}

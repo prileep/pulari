@@ -1,0 +1,57 @@
+
+{% extends 'accounts/base.html' %}
+{% load static %}
+{% block content %}
+
+
+<div>
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    {% endfor %}
+{% endif %}
+<form method="post" autocomplete="off">
+{% csrf_token %}
+
+<div style="width: 60%;">
+    <table>
+        <tr>
+            <td style="width: 100%;">
+                {% include "discount/discountbody.html" %}
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <table>
+                    <tr class="rowSpacing"><td></td></tr>
+                    <tr>
+                        <td style="text-align: right;">
+                                
+                            <td style="text-align: right;">
+                                {% if discount.disc_rid %}
+                                    <button type="button" class="submitButton"
+                                    data-rid="{{ discount.disc_rid }}"
+                                    onclick="openPrintDiscount(this.dataset.rid)">Print</button>&nbsp;
+                                {% else %}
+                                    <button type="submit" class="submitButton">Submit</button>&nbsp;
+                                {% endif %}
+                                <button type="button" onclick="window.location.href='/discount'" class="submitButton">Clear</button>
+                            </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</div>
+</form>
+{{ accounts|json_script:"accounts-data" }}
+
+
+
+<script src="{% static 'js/discount.js' %}"></script>
+
+{% endblock %}

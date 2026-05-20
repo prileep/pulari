@@ -45,7 +45,7 @@ function setReadonlyState(isReadonly) {
 function handleQtyChange(el) {
 
     cloneItemRow(el);
-    calculateSaleReturn()
+    calculatePurchaseReturn();
 }
 
 function cloneItemRow(el) {
@@ -104,7 +104,7 @@ document.addEventListener("blur", function (e) {
     }
 }, true);
 
-function calculateSaleReturn() {
+function calculatePurchaseReturn() {
 
     let prd_qty = document.getElementsByName("prd_qty");
     let prd_amount = document.getElementsByName("prd_amount");

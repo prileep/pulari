@@ -1,3 +1,9 @@
+.cancelledTransaction {
+    color: red;
+    font-size: large;
+    font-weight: bold;
+}
+
 .hidden {
     visibility: hidden;
     display: none;
@@ -197,6 +203,14 @@ tr {
     border-radius: 4px 4px 0 0;
     font-weight: bold;
     border: 1px solid #ced4da;
+}
+
+/* Update this in your custom CSS file */
+.formHeader th {
+    background-color: #d1ecf1 !important;
+    /* Replace with your desired header color */
+    color: #0c5460;
+    /* Replace with your desired text color */
 }
 
 .formHeaderReturnEntry {

@@ -20,5 +20,6 @@ from django.contrib import admin
 from django.urls import path,include
 from . import views
 urlpatterns = [
-    path('', views.salereturn, name='salereturn'),
+    path('', views.billreturn, name='billreturn'),
+    path('<int:rid>/', views.billreturn, name='rid'),
 ]

@@ -1,12 +1,13 @@
 from urllib import request
 from django.db import IntegrityError
 from django.contrib import messages
-from django.shortcuts import redirect, render
-from django.http import JsonResponse
-# Create your views here.
+from django.shortcuts import redirect, render, get_object_or_404
+from django.http import JsonResponse, HttpResponse
+from django.db import transaction, connection
+import re
+
+# Import all your models safely
 from .models import *
-from django.shortcuts import  get_object_or_404
-from django.http import HttpResponse
 
 def home(request):
     return render(request, 'accounts/home.html')
@@ -22,16 +23,21 @@ def account_list(request):
     if sort:
         field = sort.replace('-', '')
         if field in allowed_fields:
-            accounts = account.order_by(sort)
+            # ✅ FIXED: Changed lowercase 'account' to 'Account.objects'
+            accounts = Account.objects.order_by(sort)
 
     return render(request, 'accounts/account_list.html', {
         'accounts': accounts,
         'current_sort': sort
     })
 
-import re
+def get_next_acc_code():
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT get_next_sequence('Account')")
+        row = cursor.fetchone()
+    return row[0] if row else None
 
-def account(request, pk):
+def account(request, pk):  # ✅ Accepts 'pk' now to match your project's URL config
 
     account_obj = None
 
@@ -72,13 +78,10 @@ def account(request, pk):
                 account_obj.acc_is_staff = is_staff
 
                 account_obj.save()
-
                 messages.success(request, "Account updated successfully")
-                
-
             else:
                 Account.objects.create(
-                    acc_code=request.POST.get("acc_code"),
+                    acc_code=get_next_acc_code(), # ✅ Generates custom key seamlessly via DB procedure
                     acc_name=request.POST.get("acc_name"),
                     acc_place=request.POST.get("acc_place"),
                     acc_phone=request.POST.get("acc_phone"),
@@ -95,12 +98,11 @@ def account(request, pk):
         except IntegrityError:
             messages.error(request, "❌ Name and Place already exists!")
 
-        # return redirect('account_list')
-
     return render(request, 'accounts/account.html', {
         'account': account_obj,
         'next_id': next_id
     })
+
 def search_customer(request):
     query = request.GET.get('q', '')
 
@@ -110,7 +112,6 @@ def search_customer(request):
     )
 
     data = list(customers.values('acc_rid', 'acc_name'))
-
     return JsonResponse(data, safe=False)
 
 def purchase_list(request):
@@ -126,40 +127,40 @@ def report_dashboard(request):
     return HttpResponse("Report Module")
 
 def view_account(request, id):
-    account = Account.objects.get(acc_rid=id)
-    return render(request, 'accounts/view_account.html', {'account': account})
+    account_item = Account.objects.get(acc_rid=id)
+    return render(request, 'accounts/view_account.html', {'account': account_item})
+
 def edit_account(request, id):
-    account = Account.objects.get(acc_rid=id)
+    account_item = Account.objects.get(acc_rid=id)
 
     if request.method == 'POST':
-        account.acc_name = request.POST['acc_name']
-        account.acc_place = request.POST['acc_place']
-        account.acc_phone = request.POST['acc_phone']
-        account.acc_address = request.POST['acc_address']
+        account_item.acc_name = request.POST['acc_name']
+        account_item.acc_place = request.POST['acc_place']
+        account_item.acc_phone = request.POST['acc_phone']
+        account_item.acc_address = request.POST['acc_address']
 
-        account.acc_is_customer = request.POST.get('acc_is_customer') == "True"
-        account.acc_is_supplier = request.POST.get('acc_is_supplier') == "True"
-        account.acc_is_staff = request.POST.get('acc_is_staff') == "True"
+        account_item.acc_is_customer = request.POST.get('acc_is_customer') == "True"
+        account_item.acc_is_supplier = request.POST.get('acc_is_supplier') == "True"
+        account_item.acc_is_staff = request.POST.get('acc_is_staff') == "True"
 
-        account.save()
+        account_item.save()
         return redirect('account_list')
 
-    return render(request, 'accounts/edit_account.html', {'account': account})
+    return render(request, 'accounts/edit_account.html', {'account': account_item})
 
 def delete_account(request, id):
-    account = Account.objects.get(acc_rid=id)
-    account.delete()
+    account_item = Account.objects.get(acc_rid=id)
+    account_item.delete()
     return redirect('account_list')
 
 def get_next_sequence(entity):
     seq = SequenceGenerator.objects.get(seq_entity=entity)
-
     seq.seq_number += 1
     seq.save()
 
     number = str(seq.seq_number).zfill(seq.num_digits)
-
     return f"{seq.seq_prefix}{number}{seq.seq_suffix or ''}"
+
 def get_preview_sequence(entity):
     seq = SequenceGenerator.objects.get(seq_entity=entity)
     number = str(seq.seq_number + 1).zfill(seq.num_digits)

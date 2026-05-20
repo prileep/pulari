@@ -17,33 +17,38 @@ def get_next_sale_return_no():
         row = cursor.fetchone()
     return row[0] 
 
+def billreturn(request, rid=None):
 
-
-def salereturn(request):
-
-    sr_rid = request.GET.get("sr_rid")
+    if not rid:
+        rid = request.GET.get("rid")
 
     sale_return_header = None
     sale_return_details = []
     account = None
 
-    # ================= CANCEL BILL =================
+    # ================= CANCEL BILL RETURN =================
     if request.method == "POST" and request.POST.get("action") == "cancel":
 
-        sr_rid = request.POST.get("sr_rid")
+        with transaction.atomic():
+                
+            rid = request.POST.get("rid")
+            sale_return_header = SaleReturnHeader.objects.filter(sr_rid=rid).first()
 
-        SaleReturnHeader.objects.filter(sr_rid=sr_rid).update(
-            sr_status="Cancelled"
-        )
+            if sale_return_header: # Good practice to check for None
+                sale_return_header.sr_status = "Cancelled"
+                sale_return_header.save() # This works!
 
-        messages.success(request, "SaleReturn cancelled successfully ❌")
+                with connection.cursor() as cursor:
+                        cursor.callproc('post_sale_return', [sale_return_header.sr_rid])
 
-        return redirect(f"/salereturn?sr_rid={sr_rid}")
+        messages.success(request, "Bill Return cancelled successfully ❌")
+
+        return redirect(f"/billreturn/{rid}/")
 
     # ================= LOAD BILL =================
-    if sr_rid:
-        sale_return_header = SaleReturnHeader.objects.filter(sr_rid=sr_rid).first()
-        sale_return_details = SaleReturnDetail.objects.filter(srd_sr_rid=sr_rid)
+    if rid:
+        sale_return_header = SaleReturnHeader.objects.filter(sr_rid=rid).first()
+        sale_return_details = SaleReturnDetail.objects.filter(srd_sr_rid=rid)
 
         if sale_return_header:
             account = Account.objects.get(acc_rid=sale_return_header.sr_acc_rid)
@@ -117,7 +122,7 @@ def salereturn(request):
 
         messages.success(request, f"SaleReturn {sale_return_header.sr_sale_return_no} saved successfully ✅")
 
-        return redirect(f"/salereturn?sr_rid={sale_return_header.sr_rid}")
+        return redirect(f"/billreturn/{sale_return_header.sr_rid}")
 
     return render(request, 'salereturn/salereturn.html', {
         'accounts': list(accounts),

@@ -161,6 +161,11 @@
         </td>
 
         <td></td>
+        <td colspan="3">
+            {% if purchase_header.ph_rid and purchase_header.ph_status == 'Cancelled' %}
+                <div class="cancelledTransaction">The Purchase is cancelled.</div>
+            {% endif %}
+        </td>
     </tr>
 
 </table>

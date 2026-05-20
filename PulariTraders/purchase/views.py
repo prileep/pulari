@@ -19,9 +19,10 @@ def get_next_purchase_no():
     return row[0]
 
 
-def purchase(request):
+def purchase(request, rid=None):
 
-    ph_rid = request.GET.get("ph_rid")
+    if not rid:
+        rid = request.GET.get("rid")
 
     purchase_header = None
     purchase_details = []
@@ -30,20 +31,26 @@ def purchase(request):
     # ================= CANCEL BILL =================
     if request.method == "POST" and request.POST.get("action") == "cancel":
 
-        ph_rid = request.POST.get("ph_rid")
+        with transaction.atomic():
+            
+            rid = request.POST.get("rid")
+            purchase_header = PurchaseHeader.objects.filter(ph_rid=rid).first()
 
-        PurchaseHeader.objects.filter(ph_rid=ph_rid).update(
-            ph_status="Cancelled"
-        )
+            if purchase_header: # Good practice to check for None
+                purchase_header.ph_status = "Cancelled"
+                purchase_header.save() # This works!
+
+                with connection.cursor() as cursor:
+                        cursor.callproc('post_purchase', [purchase_header.ph_rid])
 
         messages.success(request, "Purchase cancelled successfully ❌")
 
-        return redirect(f"/purchase?ph_rid={ph_rid}")
+        return redirect(f"/purchase/{rid}/")
 
     # ================= LOAD BILL =================
-    if ph_rid:
-        purchase_header = PurchaseHeader.objects.filter(ph_rid=ph_rid).first()
-        purchase_details = PurchaseDetail.objects.filter(pd_ph_rid=ph_rid)
+    if rid:
+        purchase_header = PurchaseHeader.objects.filter(ph_rid=rid).first()
+        purchase_details = PurchaseDetail.objects.filter(pd_ph_rid=rid)
 
         if purchase_header:
             account = Account.objects.get(acc_rid=purchase_header.ph_acc_rid)

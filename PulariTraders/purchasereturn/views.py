@@ -33,16 +33,20 @@ def purchasereturn(request):
 
     # ================= CANCEL BILL =================
     if request.method == "POST" and request.POST.get("action") == "cancel":
+        
+        with transaction.atomic():
 
-        pr_rid = request.POST.get("pr_rid")
+            pr_rid = request.POST.get("pr_rid")
 
-        PurchasereturnHeader.objects.filter(pr_rid=pr_rid).update(
-            pr_status="Cancelled"
-        )
+            PurchasereturnHeader.objects.filter(pr_rid=pr_rid).update(
+                pr_status="Cancelled"
+            )
 
-        messages.success(request, "PurchaseReturn cancelled successfully ❌")
+            with connection.cursor() as cursor:
+                cursor.callproc('post_purchase_return', [purchase_return_header.pr_rid])
 
-        return redirect(f"/purchaseReturn?pr_rid={pr_rid}")
+            messages.success(request, "PurchaseReturn cancelled successfully ❌")
+            return redirect(f"/purchasereturn?pr_rid={pr_rid}")
 
     # ================= LOAD BILL =================
     if pr_rid:

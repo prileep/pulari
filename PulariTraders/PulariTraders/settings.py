@@ -33,8 +33,8 @@ SECRET_KEY = 'django-insecure-c1s1cl&l_t@j%is#z9ggpqg4x^*qxxcoos%nara)1jr27-jfw1
 #     'default': {
 #         'ENGINE': 'django.db.backends.mysql',
 #         'NAME': 'pulari',
-#         'USER': 'root',
-#         'PASSWORD': 'root',   
+#         'USER': 'pulariuser',
+#         'PASSWORD': 'pulariuser',   
 #         "HOST": "127.0.0.1",
 #         "PORT": "3306",
 #     }
@@ -55,7 +55,7 @@ DATABASES = {
         'NAME': 'pulari',
         'USER': 'pulariuser',
         'PASSWORD': 'pulariuser',   
-        "HOST": "64.227.176.229",
+        "HOST": "127.0.0.1",
         "PORT": "3306",
     }
 }
@@ -82,6 +82,7 @@ INSTALLED_APPS = [
     'purchasereturn',
     'transactionbrowser',
     'receipt',
+    'discount',
     'payment'
 ]
 
