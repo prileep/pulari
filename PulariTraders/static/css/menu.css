@@ -24,7 +24,27 @@
 }
 
 .active-menu {
-    background-color: #e7f1ff;
-    color: #0d6efd !important;
-    font-weight: 500;
+    /* Richer blue gradient with a very subtle bottom depth */
+    background: linear-gradient(180deg, #e8f2ff 0%, #dbeaff 100%);
+
+    /* Subtle matching border to give it structural definition */
+    border: 1px solid #b3d3ff !important;
+
+    /* Vibrant contrast text color */
+    color: #0b5ed7 !important;
+    font-weight: 600;
+
+    /* Adds a soft glow effect that makes it pop off the white navbar container */
+    box-shadow: inset 0 1px 2px rgba(13, 110, 253, 0.08), 0 1px 3px rgba(13, 110, 253, 0.1);
+}
+
+/* Optional: Smooth out the transitions so switching tabs feels premium */
+.navbar-nav .nav-link {
+    padding: 6px 14px;
+    border-radius: 6px;
+    color: #495057;
+    font-size: larger;
+    border: 1px solid transparent;
+    /* Prevents layout shifting when active border appears */
+    transition: all 0.2s ease-in-out;
 }

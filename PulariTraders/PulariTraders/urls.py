@@ -30,8 +30,8 @@ urlpatterns = [
 
     path('items/', include('items.urls')),
 
-    path('billreturn/', include('salereturn.urls')),
-    path('BillReturn/', include('salereturn.urls')),   # optional alias
+    path('billreturn/', include('billreturn.urls')),
+    path('BillReturn/', include('billreturn.urls')),   # optional alias
 
     path('purchasereturn/', include('purchasereturn.urls')),
     path('PurchaseReturn/', include('purchasereturn.urls')),   # optional alias

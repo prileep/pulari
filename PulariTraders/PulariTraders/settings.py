@@ -77,7 +77,7 @@ INSTALLED_APPS = [
     'account',
     'bill',
     'items',
-    'salereturn',
+    'billreturn',
     'purchase',
     'purchasereturn',
     'transactionbrowser',

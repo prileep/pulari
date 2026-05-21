@@ -107,7 +107,9 @@ document.addEventListener("DOMContentLoaded", function () {
                         getInputFromRowById(newRow, 'tdAccount').innerHTML = item.acc_name;
 
                         getInputFromRowById(newRow, 'tdType').innerHTML = item.acctran_ref_type;
-                        getInputFromRowById(newRow, 'tdType').href = `/${item.acctran_ref_type.toLowerCase()}/${item.acctran_ref_rid}/`;
+                        // This removes all spaces, transforming "Bill Return" into "billreturn"
+                        const pathType = item.acctran_ref_type.toLowerCase().replace(/\s+/g, '');
+                        getInputFromRowById(newRow, 'tdType').href = `/${pathType}/${item.acctran_ref_rid}/`
 
                         const bullet = '\u2022';
                         getInputFromRowById(newRow, 'tdNotes').innerHTML = item.acc_notes.replaceAll(` ${bullet} `, ` ${bullet} <wbr> `);

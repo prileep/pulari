@@ -20,19 +20,19 @@
     <table>
         <tr>
             <td style="width: 100%;">
-                {% include "salereturn/salereturnheader.html" %}
+                {% include "billreturn/billreturnheader.html" %}
             </td>
         </tr>
         <tr class="rowSpacing"><td></td></tr>
         <tr>
             <td>
-                {% include "salereturn/salereturnitem.html" %}
+                {% include "billreturn/billreturnitem.html" %}
             </td>
         </tr>
         <tr class="rowSpacing"><td></td></tr>
          <tr>
             <td>
-                {% include "salereturn/salereturnsummary.html" %}
+                {% include "billreturn/billreturnsummary.html" %}
             </td>
         </tr>
     </table>
@@ -42,6 +42,6 @@
 {{ items|json_script:"items-data" }}
 
 
-<script src="{% static 'js/salereturn.js' %}"></script>
+<script src="{% static 'js/billreturn.js' %}"></script>
 
 {% endblock %}

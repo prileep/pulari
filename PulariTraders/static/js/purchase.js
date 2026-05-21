@@ -153,3 +153,19 @@ function refreshitem() {
     }
 
 }
+
+function openPrintPurchase(rid) {
+
+    const url = `/purchase/print/${rid}/`;
+
+    const win = window.open(
+        url,
+        '_blank',
+        'width=900,height=700'
+    );
+
+    win.onload = function () {
+        win.focus();
+        win.print();
+    };
+}

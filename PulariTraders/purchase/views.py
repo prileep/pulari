@@ -19,6 +19,35 @@ def get_next_purchase_no():
     return row[0]
 
 
+def printpurchase(request, rid):
+
+    purchase_header = PurchaseHeader.objects.filter(
+        ph_rid=rid
+    ).first()
+
+    purchase_details = PurchaseDetail.objects.filter(
+        pd_ph_rid=rid
+    )
+
+    account = None
+
+    if purchase_header:
+        account = Account.objects.filter(
+            acc_rid=purchase_header.ph_acc_rid
+        ).first()
+
+    for pd in purchase_details:
+        pd.item = Item.objects.get(
+            item_rid=pd.pd_item_rid
+        )
+
+    return render(request, 'purchase/printpurchase.html', {
+        'purchase_header': purchase_header,
+        'purchase_details': purchase_details,
+        'account': account
+    })
+
+
 def purchase(request, rid=None):
 
     if not rid:
@@ -28,7 +57,7 @@ def purchase(request, rid=None):
     purchase_details = []
     account = None
 
-    # ================= CANCEL BILL =================
+    # ================= CANCEL PURCHASE =================
     if request.method == "POST" and request.POST.get("action") == "cancel":
 
         with transaction.atomic():
@@ -47,7 +76,7 @@ def purchase(request, rid=None):
 
         return redirect(f"/purchase/{rid}/")
 
-    # ================= LOAD BILL =================
+    # ================= LOAD PURCHASE =================
     if rid:
         purchase_header = PurchaseHeader.objects.filter(ph_rid=rid).first()
         purchase_details = PurchaseDetail.objects.filter(pd_ph_rid=rid)
@@ -79,7 +108,7 @@ def purchase(request, rid=None):
         'item_stk'
     )
 
-    # ================= SAVE BILL =================
+    # ================= SAVE PURCHASE =================
     if request.method == "POST":
 
         with transaction.atomic():

@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const dataEl = document.getElementById("accounts-data");
     const accounts = JSON.parse(dataEl.textContent);
-    const accountInput = document.getElementById("sr_acc_name");
+    const accountInput = document.getElementById("br_acc_name");
     // 🔥 Initialize autocomplete with callback
     inputAutocomplete(accountInput, accounts, "acc_disp_name", function (acc) {
 
@@ -13,23 +13,23 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     const itemInput = document.getElementById("item_name");
-    initSaleReturnItem(itemInput);
+    initBillReturnItem(itemInput);
 
-    let sr_net_amount = document.getElementById("sr_net_amount").value;
-    document.getElementById("sr_net_amount_words").innerHTML = numberToRupees(sr_net_amount);
+    let br_net_amount = document.getElementById("br_net_amount").value;
+    document.getElementById("br_net_amount_words").innerHTML = numberToRupees(br_net_amount);
 });
 
 function selectAccount(acc) {
-    document.getElementById("sr_acc_rid").value = acc ? acc.acc_rid : "";
-    document.getElementById("sr_acc_name").value = acc ? acc.acc_disp_name : "";
+    document.getElementById("br_acc_rid").value = acc ? acc.acc_rid : "";
+    document.getElementById("br_acc_name").value = acc ? acc.acc_disp_name : "";
     document.getElementById("accountAddress").value = acc ? acc.acc_address : "";
-    document.getElementById('sr_acc_code').value = acc ? acc.acc_code : "";
+    document.getElementById('br_acc_code').value = acc ? acc.acc_code : "";
     document.getElementById("accountPhone").value = acc ? acc.acc_phone : "";
 
     if (acc.acc_code == "CASHPARTY") {
-        document.getElementById("sr_counter_sle").checked = true;
+        document.getElementById("br_counter_sle").checked = true;
     } else {
-        document.getElementById("sr_customer_sle").checked = true;
+        document.getElementById("br_customer_sle").checked = true;
     }
 }
 
@@ -57,7 +57,7 @@ function setReadonlyState(isReadonly) {
 function handleQtyChange(el) {
 
     cloneItemRow(el);
-    calculateSaleReturn();
+    calculateBillReturn();
 }
 
 function cloneItemRow(el) {
@@ -77,23 +77,23 @@ function cloneItemRow(el) {
 
     // ✅ get element inside cloned row
     const itemInput = clone.querySelector("#item_name");
-    initSaleReturnItem(itemInput);
+    initBillReturnItem(itemInput);
 
 }
 
-function initSaleReturnItem(itemInput) {
+function initBillReturnItem(itemInput) {
     const itemsData = document.getElementById("items-data");
     const items = JSON.parse(itemsData.textContent);
     // 🔥 Initialize autocomplete with callback
     inputAutocomplete(itemInput, items, "item_display_name", function (c) {
         itemInput.value = c.item_display_name;
-        //srd_amount
+        //brd_amount
         let row = thGetRow(itemInput);
 
-        getInputFromRowById(row, "srd_amount").placeholder = parseFloat(c.item_sale_price || 0).toFixed(2);
+        getInputFromRowById(row, "brd_amount").placeholder = parseFloat(c.item_sale_price || 0).toFixed(2);
         getInputFromRowById(row, "item_stk").value = parseFloat(c.item_stk || 0).toFixed(2);
 
-        getInputFromRowById(row, "srd_item_rid").value = c.item_rid;
+        getInputFromRowById(row, "brd_item_rid").value = c.item_rid;
     });
     refreshitem();
 }
@@ -116,46 +116,46 @@ document.addEventListener("blur", function (e) {
     }
 }, true);
 
-function calculateSaleReturn() {
+function calculateBillReturn() {
 
-    let srd_qty = document.getElementsByName("srd_qty");
-    let srd_amount = document.getElementsByName("srd_amount");
-    let srd_total_amount = document.getElementsByName("srd_total_amount");
+    let brd_qty = document.getElementsByName("brd_qty");
+    let brd_amount = document.getElementsByName("brd_amount");
+    let brd_total_amount = document.getElementsByName("brd_total_amount");
     let grandTotal = parseFloat(0);
 
-    for (let i = 0; i < srd_qty.length; i++) {
+    for (let i = 0; i < brd_qty.length; i++) {
 
-        let quantity = parseFloat(srd_qty[i].value) || 0;
-        let amount = parseFloat(srd_amount[i].value) || 0;
+        let quantity = parseFloat(brd_qty[i].value) || 0;
+        let amount = parseFloat(brd_amount[i].value) || 0;
 
         let total = quantity * amount;
 
-        if (srd_total_amount[i]) {
-            srd_total_amount[i].value = total.toFixed(2);
+        if (brd_total_amount[i]) {
+            brd_total_amount[i].value = total.toFixed(2);
         }
         grandTotal = (grandTotal + total);
     }
 
-    let sr_amount = grandTotal;
-    let sr_net_amount = Math.floor(grandTotal);
-    let sr_discount = (sr_amount - sr_net_amount);
+    let br_amount = grandTotal;
+    let br_net_amount = Math.floor(grandTotal);
+    let br_discount = (br_amount - br_net_amount);
 
-    document.getElementById("sr_amount").value = sr_amount.toFixed(2);
-    document.getElementById("sr_net_amount").value = sr_net_amount.toFixed(2);
-    document.getElementById("sr_discount").value = sr_discount.toFixed(2);
-    document.getElementById("sr_net_amount_words").innerHTML = numberToRupees(sr_net_amount);
+    document.getElementById("br_amount").value = br_amount.toFixed(2);
+    document.getElementById("br_net_amount").value = br_net_amount.toFixed(2);
+    document.getElementById("br_discount").value = br_discount.toFixed(2);
+    document.getElementById("br_net_amount_words").innerHTML = numberToRupees(br_net_amount);
 }
 
 function adjustAmount() {
-    let sr_net_amount = parseFloat(document.getElementById("sr_net_amount").value);
-    let sr_amount = parseFloat(document.getElementById("sr_amount").value);
-    let sr_discount = (sr_amount - sr_net_amount);
+    let br_net_amount = parseFloat(document.getElementById("br_net_amount").value);
+    let br_amount = parseFloat(document.getElementById("br_amount").value);
+    let br_discount = (br_amount - br_net_amount);
 
-    document.getElementById("sr_amount").value = sr_amount.toFixed(2);
-    document.getElementById("sr_net_amount").value = sr_net_amount.toFixed(2);
-    document.getElementById("sr_discount").value = sr_discount.toFixed(2);
+    document.getElementById("br_amount").value = br_amount.toFixed(2);
+    document.getElementById("br_net_amount").value = br_net_amount.toFixed(2);
+    document.getElementById("br_discount").value = br_discount.toFixed(2);
 
-    document.getElementById("sr_net_amount_words").innerHTML = numberToRupees(sr_net_amount);
+    document.getElementById("br_net_amount_words").innerHTML = numberToRupees(br_net_amount);
 }
 
 function refreshitem() {
@@ -167,22 +167,22 @@ function refreshitem() {
 }
 
 function selectAccount(acc) {
-    document.getElementById("sr_acc_rid").value = acc ? acc.acc_rid : "";
-    document.getElementById("sr_acc_name").value = acc ? acc.acc_disp_name : "";
+    document.getElementById("br_acc_rid").value = acc ? acc.acc_rid : "";
+    document.getElementById("br_acc_name").value = acc ? acc.acc_disp_name : "";
     document.getElementById("accountAddress").value = acc ? acc.acc_address : "";
-    document.getElementById('sr_acc_code').value = acc ? acc.acc_code : "";
+    document.getElementById('br_acc_code').value = acc ? acc.acc_code : "";
     document.getElementById("accountPhone").value = acc ? acc.acc_phone : "";
 
     if (acc.acc_code == "CASHPARTY") {
-        document.getElementById("sr_counter_sle").checked = true;
+        document.getElementById("br_counter_sle").checked = true;
     } else {
-        document.getElementById("sr_customer_sle").checked = true;
+        document.getElementById("br_customer_sle").checked = true;
     }
 }
 
-function setSaleType(type) {
+function setBillType(type) {
 
-    //Account Sale
+    //Account Bill
     if (type == 0) {
         selectAccount(null);
     } else {

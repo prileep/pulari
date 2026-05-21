@@ -9,10 +9,10 @@
           <td style="width:14%; text-align:right;"> 
 
           <input type="number" step="0.01"
-          id="sr_amount"
-          name="sr_amount"
+          id="br_amount"
+          name="br_amount"
 
-          value="{{ sale_return_header.sr_amount|default:''}}"
+          value="{{ bill_return_header.br_amount|default:''}}"
           class="form-control form-control-sm price text-end"
           readonly tabindex="-1">
           </td>
@@ -27,9 +27,9 @@
           <td style="text-align:right;"> 
 
           <input type="number" step="0.01"
-          id="sr_discount" name="sr_discount"
+          id="br_discount" name="br_discount"
 
-          value="{{ sale_return_header.sr_discount|default:''}}"
+          value="{{ bill_return_header.br_discount|default:''}}"
           class="form-control form-control-sm price text-end" readonly tabindex="-1">
           </td>
         <td></td>
@@ -38,21 +38,21 @@
     <tr>
           <td></td>
           <td class="info">
-            <span id="sr_net_amount_words"></span>
+            <span id="br_net_amount_words"></span>
           </td>
           <td style="text-align:right;">Net Amount (Payable)&nbsp;</td>
           <td></td>
           <td style="text-align:right;"> 
 
             <input type="number" step="0.01"
-            id="sr_net_amount"
-            name="sr_net_amount"
+            id="br_net_amount"
+            name="br_net_amount"
 
-            value="{{ sale_return_header.sr_net_amount|default:''}}"
+            value="{{ bill_return_header.br_net_amount|default:''}}"
             class="form-control form-control-sm price text-end"
             onchange="adjustAmount()"
             tabindex="-1"
-            {% if sale_return_header.sr_sale_return_no %}
+            {% if bill_return_header.br_bill_return_no %}
               readonly
             {% endif%}
             >
@@ -66,8 +66,8 @@
     <td></td>
     <td style="width: 1%;"></td>
     <td style="width: 14%;">
-      {% if sale_return_header.sr_rid and sale_return_header.sr_status != 'Cancelled' %}
-        <input type="hidden" name="rid" value="{{ sale_return_header.sr_rid }}">
+      {% if bill_return_header.br_rid and bill_return_header.br_status != 'Cancelled' %}
+        <input type="hidden" name="rid" value="{{ bill_return_header.br_rid }}">
 
         <button type="submit" 
                 name="action" 
@@ -81,12 +81,12 @@
       {% endif %}
     </td>
     <td style="text-align: right; width: 84%;">
-      {% if sale_return_header.sr_rid %}
+      {% if bill_return_header.br_rid %}
         
       {% else %}
         <button type="submit" class="submitButton">Submit</button>&nbsp;
       {% endif %}
-     <button type="button" onclick="window.location.href='/salereturn'" class="submitButton">Clear</button> </td>
+     <button type="button" onclick="window.location.href='/billreturn'" class="submitButton">Clear</button> </td>
     <td style="width: 1%;"></td>
   </tr>
 </table>

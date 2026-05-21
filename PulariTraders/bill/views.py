@@ -40,7 +40,7 @@ def printbill(request, rid):
             item_rid=bd.bd_item_rid
         )
 
-    return render(request, 'bill/PrintBill.html', {
+    return render(request, 'bill/printbill.html', {
         'bill_header': bill_header,
         'bill_details': bill_details,
         'account': account

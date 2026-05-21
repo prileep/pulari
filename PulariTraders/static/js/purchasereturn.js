@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     const itemInput = document.getElementById("item_name");
-    initSaleReturnItem(itemInput);
+    initPurchaseReturnItem(itemInput);
 
     let pr_net_amount = document.getElementById("pr_net_amount").value;
     document.getElementById("pr_net_amount_words").innerHTML = numberToRupees(pr_net_amount);
@@ -65,11 +65,11 @@ function cloneItemRow(el) {
 
     // ✅ get element inside cloned row
     const itemInput = clone.querySelector("#item_name");
-    initSaleReturnItem(itemInput);
+    initPurchaseReturnItem(itemInput);
 
 }
 
-function initSaleReturnItem(itemInput) {
+function initPurchaseReturnItem(itemInput) {
     const itemsData = document.getElementById("items-data");
     const items = JSON.parse(itemsData.textContent);
     // 🔥 Initialize autocomplete with callback

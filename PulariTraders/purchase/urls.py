@@ -22,4 +22,6 @@ from django.urls import path,include
 urlpatterns = [
     path('', views.purchase, name='purchase'),
     path('<int:rid>/', views.purchase, name='rid'),
+
+    path('print/<int:rid>/', views.printpurchase, name='printpurchase'),
 ]

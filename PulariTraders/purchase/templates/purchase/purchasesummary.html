@@ -82,7 +82,9 @@
     </td>
     <td style="text-align: right; width: 78%;">
       {% if purchase_header.ph_rid %}
-        
+        <button type="button" class="submitButton"
+          data-rid="{{ purchase_header.ph_rid }}"
+          onclick="openPrintPurchase(this.dataset.rid)">Print</button>&nbsp;
       {% else %}
         <button type="submit" class="submitButton">Submit</button>&nbsp;
       {% endif %}
