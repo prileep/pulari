@@ -1,220 +1,493 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
-    <title>Transaction Report</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            color: #222;
-        }
+	<meta charset="utf-8">
+	<title>Transaction Report</title>
 
-        .page {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
+	<style>
 
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 15px;
-            border-bottom: 2px solid #333;
-            padding-bottom: 10px;
-        }
+		body {
+			font-family: Arial, sans-serif;
+			margin: 20px;
+			color: #222;
+			background: #fff;
+		}
 
-        h2 {
-            margin: 0;
-            font-size: 22px;
-        }
+		.page {
+			max-width: 1200px;
+			margin: 0 auto;
+		}
 
-        .meta {
-            font-size: 13px;
-            line-height: 1.6;
-            text-align: right;
-        }
+		.header {
+			display: flex;
+			justify-content: space-between;
+			align-items: flex-start;
+			margin-bottom: 25px;
+			border-bottom: 2px solid #333;
+			padding-bottom: 15px;
+		}
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 13px;
-        }
+		h2 {
+			margin: 0;
+			font-size: 22px;
+		}
 
-        th, td {
-            border: 1px solid #cfcfcf;
-            padding: 8px 10px;
-            vertical-align: top;
-        }
+		.muted {
+			color: #777;
+			font-size: 13px;
+			margin-top: 4px;
+		}
 
-        th {
-            background: #f3f3f3;
-            text-align: left;
-        }
+		/* Wrapper container to line up summary elements horizontally on the right side */
+		.top-right-displays {
+			display: flex;
+			gap: 20px;
+			align-items: flex-start;
+			justify-content: flex-end;
+			width: 60%; /* Allocated flexible spacing room across the header banner */
+		}
 
-        td.num, th.num {
-            text-align: right;
-        }
+		/* Top Right Vertical Summary Card Styles */
+		.top-summary-table {
+			width: 240px;
+			font-size: 12px;
+			margin-bottom: 0;
+		}
+		
+		.top-summary-table th, 
+		.top-summary-table td {
+			padding: 4px 10px;
+			border: 1px solid #e0e0e0;
+		}
+		
+		.top-summary-table th {
+			background: #f8f9fa;
+			font-weight: normal;
+			color: #555;
+			text-align: left;
+			width: 50%;
+		}
 
-        td.center, th.center {
-            text-align: center;
-        }
+		.top-summary-table td {
+			text-align: right;
+			font-weight: bold;
+		}
 
-        .muted {
-            color: #777;
-        }
+		table {
+			width: 100%;
+			border-collapse: collapse;
+			font-size: 13px;
+			margin-bottom: 20px;
+		}
 
-        .summary-row td {
-            font-weight: bold;
-            background: #fafafa;
-        }
+		/* Compact secondary items summary tracking grid */
+		.compact-summary-table {
+			width: 250px; /* Constrained baseline width layout footprint to look cleaner next to balance card */
+			font-size: 12px;
+			margin-bottom: 0;
+		}
 
-        @media print {
-            body {
-                margin: 0;
-            }
-            .page {
-                max-width: none;
-                margin: 0;
-            }
-        }
-    </style>
+		th, td {
+			border: 1px solid #cfcfcf;
+			padding: 8px 10px;
+			vertical-align: top;
+		}
+
+		.fit-content {
+			white-space: nowrap;
+		}
+
+		th {
+			background: #f3f3f3;
+			text-align: left;
+		}
+
+		td.num,
+		th.num {
+			text-align: right;
+			white-space: nowrap;
+		}
+
+		td.center,
+		th.center {
+			text-align: center;
+		}
+
+		.nowrap {
+			white-space: nowrap;
+		}
+
+		.summary-row td {
+			font-weight: bold;
+			background: #fafafa;
+		}
+
+		@media print {
+
+			body {
+				margin: 0;
+			}
+
+			.page {
+				max-width: none;
+				margin: 0;
+			}
+		}
+
+	</style>
 </head>
-<body>
-<div class="page">
-    <div class="header">
-        <div>
-            <h2>Transaction Report</h2>
-            <div class="muted">Generated on: <span id="generatedOn"></span></div>
-        </div>
-        <div class="meta" id="filtersText"></div>
-    </div>
 
-    <table>
-        <thead>
-            <tr>
-                <th class="center">#</th>
-                <th>Date</th>
-                <th>Account</th>
-                <th>Type</th>
-                <th>Notes</th>
-                <th class="num">Cash In</th>
-                <th class="num">Cash Out</th>
-                <th class="num">Balance</th>
-            </tr>
-        </thead>
-        <tbody id="reportBody">
-            <tr>
-                <td colspan="8" class="center">Loading...</td>
-            </tr>
-        </tbody>
-    </table>
+<body>
+
+<div class="page">
+
+	<div class="header">
+
+		<div>
+			<h2>TRANSACTION REPORT</h2>
+			<div id="filtersTextDisplay" style="font-size: 13px; line-height: 1.5; margin-top: 4px;"></div>
+
+			<div class="muted" style="margin-top: 6px;">
+				Printed on:
+				<span id="generatedOn"></span>
+			</div>
+		</div>
+
+		<div class="top-right-displays">
+			
+			<table class="top-summary-table">
+				<tbody>
+					<tr>
+						<th>Cash In</th>
+						<td id="topCashIn">-</td>
+					</tr>
+					<tr>
+						<th>Cash Out</th>
+						<td id="topClosingOut">-</td>
+					</tr>
+				</tbody>
+			</table>
+
+			<table class="compact-summary-table" id="itemSummarySection">
+				<thead>
+					<tr>
+						<th class="fit-content">Item Code</th>
+						<th class="num fit-content">StockIn</th>
+						<th class="num fit-content">StockOut</th>
+					</tr>
+				</thead>
+				<tbody id="itemSummaryBody">
+					<tr>
+						<td colspan="3" class="center">
+							Loading...
+						</td>
+					</tr>
+				</tbody>
+			</table>
+
+		</div>
+
+	</div>
+
+	<table>
+		<thead>
+			<tr>
+				<th class="center">#</th>
+				<th>Date</th>
+				<th>Account</th>
+				<th>Notes</th>
+				<th class="num">Cash In</th>
+				<th class="num">Cash Out</th>
+			</tr>
+		</thead>
+		<tbody id="reportBody">
+			<tr>
+				<td colspan="6" class="center">
+					Loading...
+				</td>
+			</tr>
+		</tbody>
+	</table>
+
 </div>
 
 <script>
+
 function formatIndianCurrency(value) {
-    return new Intl.NumberFormat("en-IN", {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0
-    }).format(Number(value || 0));
+
+	return new Intl.NumberFormat(
+		"en-IN",
+		{
+			minimumFractionDigits: 0,
+			maximumFractionDigits: 0
+		}
+	).format(Number(value || 0));
+
+}
+
+function formatToIndianDate(dateStr) {
+	if (!dateStr) return "-";
+	const parts = dateStr.split("-");
+	if (parts.length === 3 && parts[0].length === 4) {
+		return `${parts[2]}-${parts[1]}-${parts[0]}`;
+	}
+	return dateStr;
+}
+
+// Custom parser formatting current runtime clock ticks into DD-MM-YYYY AM/PM setup patterns
+function formatGeneratedTimestamp() {
+	const now = new Date();
+	
+	const day = String(now.getDate()).padStart(2, '0');
+	const month = String(now.getMonth() + 1).padStart(2, '0');
+	const year = now.getFullYear();
+	
+	let hours = now.getHours();
+	const minutes = String(now.getMinutes()).padStart(2, '0');
+	const ampm = hours >= 12 ? 'PM' : 'AM';
+	
+	hours = hours % 12;
+	hours = hours ? hours : 12; // Converts hour '0' to '12'
+	const strHours = String(hours).padStart(2, '0');
+	
+	return `${day}-${month}-${year} ${strHours}:${minutes} ${ampm}`;
 }
 
 function getParams() {
-    return new URLSearchParams(window.location.search);
+
+	return new URLSearchParams(window.location.search);
+
 }
 
 function buildFiltersText(params) {
-    const parts = [];
-    const map = [
-        ["acctran_ref_type", "Type"],
-        ["status", "Status"],
-        ["from_date", "From"],
-        ["to_date", "To"],
-        ["account_rid", "Account"],
-        ["refno", "Ref No"],
-        ["notes", "Notes"],
-        ["amount_from", "Amount From"],
-        ["amount_to", "Amount To"],
-    ];
+	const parts = [];
+	const map = [
+		["acctran_ref_type", "Type"],
+		["status", "Status"],
+		["from_date", "From"],
+		["to_date", "To"],
+		["account_rid", "Account"],
+		["refno", "Ref No"],
+		["notes", "Notes"],
+		["amount_from", "Amount From"],
+		["amount_to", "Amount To"],
+	];
 
-    map.forEach(([key, label]) => {
-        const val = params.get(key);
-        if (val) parts.push(`${label}: ${val}`);
-    });
+	map.forEach(([key, label]) => {
+		let val = params.get(key);
+		if (val) {
+			if (key === "from_date" || key === "to_date") {
+				val = formatToIndianDate(val);
+			}
+			parts.push(`<strong>${label}:</strong> ${val}`);
+		}
+	});
 
-    return parts.length ? parts.join("<br>") : "All records";
+	return parts.length ? parts.join(" | ") : "All records";
 }
 
 async function loadReport() {
-    const params = getParams();
 
-    document.getElementById("generatedOn").textContent = new Date().toLocaleString();
-    document.getElementById("filtersText").innerHTML = buildFiltersText(params);
+	const params = getParams();
 
-    const body = document.getElementById("reportBody");
-    body.innerHTML = `<tr><td colspan="8" class="center">Loading...</td></tr>`;
+	document.getElementById("filtersTextDisplay").innerHTML = buildFiltersText(params);
+	document.getElementById("generatedOn").innerHTML = formatGeneratedTimestamp();
 
-    try {
-        const res = await fetch(`/transactionbrowser/transaction-search/?${params.toString()}`);
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+	const body = document.getElementById("reportBody");
+	const itemBody = document.getElementById("itemSummaryBody");
 
-        const data = await res.json();
+	body.innerHTML = `
+		<tr>
+			<td colspan="6" class="center">
+				Loading...
+			</td>
+		</tr>
+	`;
+	
+	itemBody.innerHTML = `
+		<tr>
+			<td colspan="3" class="center">
+				Loading...
+			</td>
+		</tr>
+	`;
 
-        if (!data.transactions || data.transactions.length === 0) {
-            body.innerHTML = `<tr><td colspan="8" class="center">No matching records found!</td></tr>`;
-            return;
-        }
+	try {
 
-        const rows = [];
-        let i = 0;
-        let totCashIn = 0;
-        let totCashOut = 0;
-        let lastItem = null;
+		const res = await fetch(
+			`/transactionbrowser/transaction-search/?${params.toString()}`
+		);
 
-        data.transactions.forEach(item => {
-            lastItem = item;
-            totCashIn += Number(item.cr_amt || 0);
-            totCashOut += Number(item.dr_amt || 0);
+		if (!res.ok) {
 
-            const notes = (item.acc_notes || "").replaceAll(" • ", " • <wbr> ");
+			throw new Error(`HTTP ${res.status}`);
 
-            rows.push(`
-                <tr>
-                    <td class="center">${++i}</td>
-                    <td>${item.acctran_date || ""}</td>
-                    <td>${item.acc_name || ""}</td>
-                    <td>${item.acctran_ref_type || ""}</td>
-                    <td>${notes}</td>
-                    <td class="num">${item.cr_amt == 0 ? "-" : formatIndianCurrency(item.cr_amt)}</td>
-                    <td class="num">${item.dr_amt == 0 ? "-" : formatIndianCurrency(item.dr_amt)}</td>
-                    <td class="num">${formatIndianCurrency(item.balance)}</td>
-                </tr>
-            `);
-        });
+		}
 
-        rows.push(`
-            <tr class="summary-row">
-                <td colspan="4" class="num">Opening</td>
-                <td class="num">${formatIndianCurrency(lastItem.open_balance)}</td>
-                <td class="num">(-)${formatIndianCurrency(totCashIn)}</td>
-                <td class="num">${formatIndianCurrency(totCashOut)}</td>
-                <td class="num">${formatIndianCurrency(lastItem.balance)}</td>
-            </tr>
-        `);
+		const data = await res.json();
 
-        body.innerHTML = rows.join("");
+		// --- Process First Table: Financial Transactions Ledger ---
+		if (!data.transactions || data.transactions.length === 0) {
 
-        setTimeout(() => {
-            window.print();
-        }, 300);
+			body.innerHTML = `
+				<tr>
+					<td colspan="6" class="center">
+						No matching records found!
+					</td>
+				</tr>
+			`;
 
-    } catch (err) {
-        console.error(err);
-        body.innerHTML = `<tr><td colspan="8" class="center">Error loading report</td></tr>`;
-    }
+			document.getElementById("topCashIn").innerHTML  = "0";
+			document.getElementById("topClosingOut").innerHTML = "0";
+
+		} else {
+			
+			// Balanced multi-tier comparator engine with flexible partial string validation matches
+			data.transactions.sort((a, b) => {
+				const parseToCompareDate = (dStr) => {
+					if (!dStr) return "";
+					const p = dStr.split("-");
+					return p.length === 3 ? `${p[2]}-${p[1]}-${p[0]}` : dStr;
+				};
+
+				const dateA = parseToCompareDate(a.acctran_date);
+				const dateB = parseToCompareDate(b.acctran_date);
+
+				if (dateA !== dateB) {
+					return dateA.localeCompare(dateB);
+				}
+
+				const nameA = (a.acc_name || "").toUpperCase().trim();
+				const nameB = (b.acc_name || "").toUpperCase().trim();
+
+				if (nameA.includes("CASH") && !nameB.includes("CASH")) return -1;
+				if (nameB.includes("CASH") && !nameA.includes("CASH")) return 1;
+
+				return nameA.localeCompare(nameB);
+			});
+
+			const rows = [];
+			let i = 0;
+			let totCashIn = 0;
+			let totCashOut = 0;
+
+			data.transactions.forEach((item) => {
+				totCashIn += Number(item.cr_amt || 0);
+				totCashOut += Number(item.dr_amt || 0);
+
+				const notes =
+					(item.acc_notes || "")
+					.replaceAll(" • ", " • <wbr> ");
+
+				rows.push(`
+					<tr>
+						<td class="center">
+							${++i}
+						</td>
+						<td class="nowrap">
+							${formatToIndianDate(item.acctran_date)}
+						</td>
+						<td>
+							${item.acc_name || ""}
+						</td>
+						<td>
+							${notes}
+						</td>
+						<td class="num">
+							${
+								item.cr_amt == 0
+								? "-"
+								: formatIndianCurrency(item.cr_amt)
+							}
+						</td>
+						<td class="num">
+							${
+								item.dr_amt == 0
+								? "-"
+								: formatIndianCurrency(item.dr_amt)
+							}
+						</td>
+					</tr>
+				`);
+
+			});
+
+			// ✅ Opening Balance summary row has been hidden, replaced by clean summary totals row mapping columns safely
+			rows.push(`
+				<tr class="summary-row">
+					<td colspan="4" class="num">Total</td>
+					<td class="num">
+						${formatIndianCurrency(totCashIn)}
+					</td>
+					<td class="num">
+						${formatIndianCurrency(totCashOut)}
+					</td>
+				</tr>
+			`);
+
+			body.innerHTML = rows.join("");
+
+			document.getElementById("topCashIn").innerHTML  = formatIndianCurrency(totCashIn);
+			document.getElementById("topClosingOut").innerHTML = formatIndianCurrency(totCashOut);
+		}
+
+		// --- Process Second Table: Item Stock Tracking Summaries ---
+		if (!data.itemsummary || data.itemsummary.length === 0) {
+			itemBody.innerHTML = `
+				<tr>
+					<td colspan="3" class="center">
+						No records.
+					</td>
+				</tr>
+			`;
+		} else {
+			const itemRows = [];
+
+			data.itemsummary.forEach(summaryItem => {
+				const codeStr = summaryItem.item_code || "-";
+
+				itemRows.push(`
+					<tr>
+						<td class="fit-content">${codeStr}</td>
+						<td class="num fit-content">${summaryItem.StockIn == 0 ? "-" : formatIndianCurrency(summaryItem.StockIn)}</td>
+						<td class="num fit-content">${summaryItem.StockOut == 0 ? "-" : formatIndianCurrency(summaryItem.StockOut)}</td>
+					</tr>
+				`);
+			});
+
+			itemBody.innerHTML = itemRows.join("");
+		}
+
+		setTimeout(() => {
+			window.print();
+		}, 300);
+
+	}
+	catch (err) {
+
+		console.error(err);
+
+		body.innerHTML = `
+			<tr>
+				<td colspan="6" class="center">
+					Error loading report
+				</td>
+			</tr>
+		`;
+		
+		itemBody.innerHTML = `
+			<tr>
+				<td colspan="3" class="center">
+					Error.
+				</td>
+			</tr>
+		`;
+	}
 }
 
 window.addEventListener("load", loadReport);
+
 </script>
+
 </body>
 </html>

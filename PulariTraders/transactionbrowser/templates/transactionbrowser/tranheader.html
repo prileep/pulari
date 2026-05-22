@@ -1,17 +1,17 @@
 <table class="boxShape entryForm" id="transactionBrowserTable">
     <tr class="formHeader">
         <td></td>
-        <td colspan="8" style="text-align:left;">Transaction Browser</td>
+        <td colspan="11" style="text-align:left;">Transaction Browser</td>
         <td></td>
     </tr>
     <tr>
         <td style="width:1%;"></td>
 
-        <td style="width:15%;">Type</td>
+        <td style="width:10%;">Type</td>
 
         <td style="width:1%;"></td>
 
-        <td style="width:26%;">
+        <td style="width:21%;">
             <select id="acctran_ref_type"
                     name="acctran_ref_type"
                     class="form-control form-control-sm">
@@ -19,6 +19,8 @@
                 <option value="Bill">Bill</option>
                 <option value="Bill Return">Bill Return</option>
                 <option value="Receipt">Receipt</option>
+                <option value="Payment">Payment</option>
+                <option value="Discount">Discount</option>
                 <option value="Purchase">Purchase</option>
                 <option value="Purchase Return">Purchase Return</option>
             </select>
@@ -26,9 +28,9 @@
 
         <td style="width:1%;"></td>
 
-        <td style="width:15%;">Date</td>
-
-        <td>
+        <td style="width:7%;">Date</td>
+        <td style="width:1%;"></td>
+        <td style="width:24%;">
             <table style="width:100%;">
                 <tr>
                     <td style="width:45%;">
@@ -51,18 +53,10 @@
                 </tr>
             </table>
         </td>
-
         <td style="width:1%;"></td>
-    </tr>
-
-    <tr>
-        <td></td>
-
-        <td>Status</td>
-
-        <td></td>
-
-        <td>
+        <td style="width:10%;">Status</td>
+        <td style="width:1%;"></td>
+        <td style="width:21%;">
             <select id="tran_status"
                     name="tran_status"
                     class="form-control form-control-sm">
@@ -71,10 +65,14 @@
                 <option value="Cancelled">Cancelled</option>
             </select>
         </td>
-
+        <td style="width:1%;"></td>
+    </tr>
+    <tr>
         <td></td>
 
         <td>Account</td>
+
+        <td></td>
 
         <td>
             <input type="text"
@@ -91,15 +89,9 @@
         </td>
 
         <td></td>
-    </tr>
-
-    <tr>
-        <td></td>
 
         <td>Ref No</td>
-
         <td></td>
-
         <td>
             <input type="text"
                    id="tran_refno"
@@ -107,29 +99,47 @@
                    class="form-control form-control-sm"
                    placeholder="Bill#, Purchase#, Receipt# etc..">
         </td>
-
         <td></td>
-
+        <td>Item</td>
+        <td></td>
+        <td>
+            <table style="width:100%;">
+                <tr>
+                    <td style="width:80%;"> 
+                        <input type="text"
+                            id="tran_item"
+                            name="tran_item"
+                            class="form-control form-control-sm"
+                            autocomplete="off">
+                            <div id="suggestionBox" class="suggestion-box"></div>
+                    </td>
+                    <td style="width:20%;">
+                        <input type="text"
+                            id="tran_item_code"
+                            name="tran_item_code"
+                            class="form-control form-control-sm"
+                            autocomplete="off"
+                            readonly>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td></td>
         <td>Notes</td>
-
+        <td></td>
         <td>
             <input type="text"
                    id="tran_notes"
                    name="tran_notes"
                    class="form-control form-control-sm">
         </td>
-
         <td></td>
-    </tr>
-
-
-    <tr>
+        <td>
+            Amount
+        </td>
         <td></td>
-
-        <td>Amount</td>
-
-        <td></td>
-
         <td>
             <table style="width:100%;">
                 <tr>
@@ -151,11 +161,7 @@
                 </tr>
             </table>
         </td>
-
         <td></td>
-
-        <td></td>
-
         <td colspan="7" style="text-align:right;">
             <a href="#"
                id="transactionPrintBtn"
@@ -170,9 +176,8 @@
                style="font-size:larger;">
                 Search
             </a>
-
-            &nbsp;&nbsp;&nbsp;
         </td>
         <td></td>
     </tr>
+
 </table>

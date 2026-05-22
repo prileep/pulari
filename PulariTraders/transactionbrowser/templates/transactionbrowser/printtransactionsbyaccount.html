@@ -1,192 +1,223 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
-    <title>Balance Sheet</title>
+	<meta charset="utf-8">
+	<title>Balance Sheet</title>
 
-    <style>
+	<style>
 
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            color: #222;
-            background: #fff;
-        }
+		body {
+			font-family: Arial, sans-serif;
+			margin: 20px;
+			color: #222;
+			background: #fff;
+		}
 
-        .page {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
+		.page {
+			max-width: 1200px;
+			margin: 0 auto;
+		}
 
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 15px;
-            border-bottom: 2px solid #333;
-            padding-bottom: 10px;
-        }
+		.header {
+			display: flex;
+			justify-content: space-between;
+			align-items: flex-start;
+			margin-bottom: 25px;
+			border-bottom: 2px solid #333;
+			padding-bottom: 15px;
+		}
 
-        h2 {
-            margin: 0;
-            font-size: 22px;
-        }
+		h2 {
+			margin: 0;
+			font-size: 22px;
+		}
 
-        .muted {
-            color: #777;
-            font-size: 13px;
-            margin-top: 4px;
-        }
+		.muted {
+			color: #777;
+			font-size: 13px;
+			margin-top: 4px;
+		}
 
-        /* Top Right Vertical Summary Card Styles */
-        .top-summary-table {
-            width: 240px;
-            font-size: 12px;
-        }
-        
-        .top-summary-table th, 
-        .top-summary-table td {
-            padding: 4px 10px;
-            border: 1px solid #e0e0e0;
-        }
-        
-        .top-summary-table th {
-            background: #f8f9fa;
-            font-weight: normal;
-            color: #555;
-            text-align: left;
-            width: 50%;
-        }
+		/* Wrapper container to line up summary elements horizontally on the right side */
+		.top-right-displays {
+			display: flex;
+			gap: 20px;
+			align-items: flex-start;
+			justify-content: flex-end;
+			width: 60%; /* Allocated flexible spacing room across the header banner */
+		}
 
-        .top-summary-table td {
-            text-align: right;
-            font-weight: bold;
-        }
+		/* Top Right Vertical Summary Card Styles */
+		.top-summary-table {
+			width: 240px;
+			font-size: 12px;
+			margin-bottom: 0;
+		}
+		
+		.top-summary-table th, 
+		.top-summary-table td {
+			padding: 4px 10px;
+			border: 1px solid #e0e0e0;
+		}
+		
+		.top-summary-table th {
+			background: #f8f9fa;
+			font-weight: normal;
+			color: #555;
+			text-align: left;
+			width: 50%;
+		}
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 13px;
-        }
+		.top-summary-table td {
+			text-align: right;
+			font-weight: bold;
+		}
 
-        th, td {
-            border: 1px solid #cfcfcf;
-            padding: 8px 10px;
-            vertical-align: top;
-        }
+		table {
+			width: 100%;
+			border-collapse: collapse;
+			font-size: 13px;
+			margin-bottom: 20px;
+		}
 
-        th {
-            background: #f3f3f3;
-            text-align: left;
-        }
+		/* Compact secondary items summary tracking grid */
+		.compact-summary-table {
+			width: 250px; /* Constrained baseline width layout footprint to look cleaner next to balance card */
+			font-size: 12px;
+			margin-bottom: 0;
+		}
 
-        td.num,
-        th.num {
-            text-align: right;
-            white-space: nowrap;
-        }
+		th, td {
+			border: 1px solid #cfcfcf;
+			padding: 8px 10px;
+			vertical-align: top;
+		}
 
-        td.center,
-        th.center {
-            text-align: center;
-        }
+		.fit-content {
+			white-space: nowrap;
+		}
 
-        .nowrap {
-            white-space: nowrap;
-        }
+		th {
+			background: #f3f3f3;
+			text-align: left;
+		}
 
-        .summary-row td {
-            font-weight: bold;
-            background: #fafafa;
-        }
+		td.num,
+		th.num {
+			text-align: right;
+			white-space: nowrap;
+		}
 
-        @media print {
+		td.center,
+		th.center {
+			text-align: center;
+		}
 
-            body {
-                margin: 0;
-            }
+		.nowrap {
+			white-space: nowrap;
+		}
 
-            .page {
-                max-width: none;
-                margin: 0;
-            }
-        }
+		.summary-row td {
+			font-weight: bold;
+			background: #fafafa;
+		}
 
-    </style>
+		@media print {
+
+			body {
+				margin: 0;
+			}
+
+			.page {
+				max-width: none;
+				margin: 0;
+			}
+		}
+
+	</style>
 </head>
 
 <body>
 
 <div class="page">
 
-    <div class="header">
+	<div class="header">
 
-        <div>
-            <!-- Hardcoded text element adjusted to uppercase requested string -->
-            <h2>BALANCE SHEET</h2>
-            <div id="accountNameDisplay" style="font-size: 15px; font-weight: bold; margin-top: 4px;"></div>
-            
-            <!-- Date Range Display Container Element -->
-            <div id="dateRangeDisplay" class="muted" style="font-weight: bold; margin-bottom: 2px;"></div>
+		<div>
+			<h2>BALANCE SHEET</h2>
+			<div id="accountNameDisplay" style="font-size: 15px; font-weight: bold; margin-top: 4px;"></div>
+			
+			<div id="dateRangeDisplay" class="muted" style="font-weight: bold; margin-bottom: 2px;"></div>
 
-            <div class="muted">
-                Generated on:
-                <span id="generatedOn"></span>
-            </div>
-        </div>
+			<div class="muted">
+				Printed on:
+				<span id="generatedOn"></span>
+			</div>
+		</div>
 
-        <!-- Top Right Row-Based Summary Table -->
-        <div>
-            <table class="top-summary-table">
-                <tbody>
-                    <tr>
-                        <th>Opening Balance</th>
-                        <td id="topOpening">-</td>
-                    </tr>
-                    <tr>
-                        <th>Cash In</th>
-                        <td id="topCashIn">-</td>
-                    </tr>
-                    <tr>
-                        <th>Cash Out</th>
-                        <td id="topClosingOut">-</td>
-                    </tr>
-                    <tr style="background: #fafafa;">
-                        <th>Closing Balance</th>
-                        <td id="topClosing">-</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+		<div class="top-right-displays">
+			
+			<table class="top-summary-table">
+				<tbody>
+					<tr>
+						<th>Opening Balance</th>
+						<td id="topOpening">-</td>
+					</tr>
+					<tr>
+						<th>Cash In</th>
+						<td id="topCashIn">-</td>
+					</tr>
+					<tr>
+						<th>Cash Out</th>
+						<td id="topClosingOut">-</td>
+					</tr>
+					<tr style="background: #fafafa;">
+						<th>Closing Balance</th>
+						<td id="topClosing">-</td>
+					</tr>
+				</tbody>
+			</table>
 
-    </div>
+			<table class="compact-summary-table" id="itemSummarySection">
+				<thead>
+					<tr>
+						<th class="fit-content">Item Code</th>
+						<th class="num fit-content">StockIn</th>
+						<th class="num fit-content">StockOut</th>
+					</tr>
+				</thead>
+				<tbody id="itemSummaryBody">
+					<tr>
+						<td colspan="3" class="center">
+							Loading...
+						</td>
+					</tr>
+				</tbody>
+			</table>
 
-    <table>
+		</div>
 
-        <thead>
+	</div>
 
-            <tr>
-                <th class="center">#</th>
-                <th>Date</th>
-                <th>Notes</th>
-                <th class="num">Cash In</th>
-                <th class="num">Cash Out</th>
-                <th class="num">Balance</th>
-            </tr>
-
-        </thead>
-
-        <tbody id="reportBody">
-
-            <tr>
-                <td colspan="6" class="center">
-                    Loading...
-                </td>
-            </tr>
-
-        </tbody>
-
-    </table>
+	<table>
+		<thead>
+			<tr>
+				<th class="center">#</th>
+				<th>Date</th>
+				<th>Notes</th>
+				<th class="num">Cash In</th>
+				<th class="num">Cash Out</th>
+				<th class="num">Balance</th>
+			</tr>
+		</thead>
+		<tbody id="reportBody">
+			<tr>
+				<td colspan="6" class="center">
+					Loading...
+				</td>
+			</tr>
+		</tbody>
+	</table>
 
 </div>
 
@@ -194,224 +225,267 @@
 
 function formatIndianCurrency(value) {
 
-    return new Intl.NumberFormat(
-        "en-IN",
-        {
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0
-        }
-    ).format(Number(value || 0));
+	return new Intl.NumberFormat(
+		"en-IN",
+		{
+			minimumFractionDigits: 0,
+			maximumFractionDigits: 0
+		}
+	).format(Number(value || 0));
 
 }
 
-// Helper Function to cleanly switch YYYY-MM-DD into DD-MM-YYYY
 function formatToIndianDate(dateStr) {
-    if (!dateStr) return "-";
-    const parts = dateStr.split("-");
-    if (parts.length === 3 && parts[0].length === 4) {
-        return `${parts[2]}-${parts[1]}-${parts[0]}`;
-    }
-    return dateStr;
+	if (!dateStr) return "-";
+	const parts = dateStr.split("-");
+	if (parts.length === 3 && parts[0].length === 4) {
+		return `${parts[2]}-${parts[1]}-${parts[0]}`;
+	}
+	return dateStr;
+}
+
+// Custom parser formatting current runtime clock ticks into DD-MM-YYYY AM/PM setup patterns
+function formatGeneratedTimestamp() {
+	const now = new Date();
+	
+	const day = String(now.getDate()).padStart(2, '0');
+	const month = String(now.getMonth() + 1).padStart(2, '0');
+	const year = now.getFullYear();
+	
+	let hours = now.getHours();
+	const minutes = String(now.getMinutes()).padStart(2, '0');
+	const ampm = hours >= 12 ? 'PM' : 'AM';
+	
+	hours = hours % 12;
+	hours = hours ? hours : 12; // Converts hour '0' to '12'
+	const strHours = String(hours).padStart(2, '0');
+	
+	return `${day}-${month}-${year} ${strHours}:${minutes} ${ampm}`;
 }
 
 function getParams() {
 
-    return new URLSearchParams(window.location.search);
+	return new URLSearchParams(window.location.search);
 
 }
 
 async function loadReport() {
 
-    const params = getParams();
+	const params = getParams();
 
-    const account = params.get("account") || "All Accounts";
-    const fromDate = params.get("from_date") || "";
-    const toDate = params.get("to_date") || "";
+	const account = params.get("account") || "All Accounts";
+	const fromDate = params.get("from_date") || "";
+	const toDate = params.get("to_date") || "";
 
-    // Placed Account identifier string into its own descriptive element layer underneath main title
-    document.getElementById("accountNameDisplay").innerHTML = account;
+	document.getElementById("accountNameDisplay").innerHTML = account;
 
-    // Handle the Date Range dynamic string formatting logic
-    const rangeContainer = document.getElementById("dateRangeDisplay");
-    if (fromDate || toDate) {
-        const formattedFrom = formatToIndianDate(fromDate);
-        const formattedTo = formatToIndianDate(toDate);
-        rangeContainer.innerHTML = `Date Range: ${formattedFrom} - ${formattedTo}`;
-        rangeContainer.style.display = "block";
-    } else {
-        rangeContainer.style.display = "none";
-    }
+	const rangeContainer = document.getElementById("dateRangeDisplay");
+	if (fromDate || toDate) {
+		const formattedFrom = formatToIndianDate(fromDate);
+		const formattedTo = formatToIndianDate(toDate);
+		rangeContainer.innerHTML = `Date Range: ${formattedFrom} - ${formattedTo}`;
+		rangeContainer.style.display = "block";
+	} else {
+		rangeContainer.style.display = "none";
+	}
 
-    document.getElementById("generatedOn").innerHTML =
-        new Date().toLocaleString();
+	// ✅ Modified: Uses the custom DD-MM-YYYY AM/PM layout engine timestamp
+	document.getElementById("generatedOn").innerHTML = formatGeneratedTimestamp();
 
-    const body = document.getElementById("reportBody");
+	const body = document.getElementById("reportBody");
+	const itemBody = document.getElementById("itemSummaryBody");
 
-    body.innerHTML = `
-        <tr>
-            <td colspan="6" class="center">
-                Loading...
-            </td>
-        </tr>
-    `;
+	body.innerHTML = `
+		<tr>
+			<td colspan="6" class="center">
+				Loading...
+			</td>
+		</tr>
+	`;
+	
+	itemBody.innerHTML = `
+		<tr>
+			<td colspan="3" class="center">
+				Loading...
+			</td>
+		</tr>
+	`;
 
-    try {
+	try {
 
-        const res = await fetch(
-            `/transactionbrowser/transaction-search/?${params.toString()}`
-        );
+		const res = await fetch(
+			`/transactionbrowser/transaction-search/?${params.toString()}`
+		);
 
-        if (!res.ok) {
+		if (!res.ok) {
 
-            throw new Error(`HTTP ${res.status}`);
+			throw new Error(`HTTP ${res.status}`);
 
-        }
+		}
 
-        const data = await res.json();
+		const data = await res.json();
 
-        if (!data.transactions || data.transactions.length === 0) {
+		// --- Process First Table: Financial Transactions Ledger ---
+		if (!data.transactions || data.transactions.length === 0) {
 
-            body.innerHTML = `
-                <tr>
-                    <td colspan="6" class="center">
-                        No matching records found!
-                    </td>
-                </tr>
-            `;
+			body.innerHTML = `
+				<tr>
+					<td colspan="6" class="center">
+						No matching records found!
+					</td>
+				</tr>
+			`;
 
-            return;
-        }
+			document.getElementById("topOpening").innerHTML = "0";
+			document.getElementById("topCashIn").innerHTML  = "0";
+			document.getElementById("topClosingOut").innerHTML = "0";
+			document.getElementById("topClosing").innerHTML = "0";
 
-        const rows = [];
+		} else {
+			const rows = [];
 
-        let i = 0;
-        let totCashIn = 0;
-        let totCashOut = 0;
-        let lastItem = null;
+			let i = 0;
+			let totCashIn = 0;
+			let totCashOut = 0;
+			let lastItem = null;
 
-        data.transactions.forEach((item, index) => {
+			data.transactions.forEach((item, index) => {
 
-            lastItem = item;
+				lastItem = item;
 
-            // Insert the extra opening row immediately if this was the first item
-            if (index === 0) {
-                rows.push(`
-                    <tr>
+				if (index === 0) {
+					rows.push(`
+						<tr>
+							<td class="center"></td>
+							<td class="nowrap"></td>
+							<td class="num">(Opening)</td>
+							<td class="num"></td>
+							<td class="num"></td>
+							<td class="num">
+								${formatIndianCurrency(item.open_balance)}
+							</td>
+						</tr>
+					`);
+				}
 
-                        <td class="center"></td>
+				totCashIn += Number(item.cr_amt || 0);
+				totCashOut += Number(item.dr_amt || 0);
 
-                        <td class="nowrap"></td>
+				const notes =
+					(item.acc_notes || "")
+					.replaceAll(" • ", " • <wbr> ");
 
-                        <td class="num">(Opening)</td>
+				rows.push(`
+					<tr>
+						<td class="center">
+							${++i}
+						</td>
+						<td class="nowrap">
+							${formatToIndianDate(item.acctran_date)}
+						</td>
+						<td>
+							${notes}
+						</td>
+						<td class="num">
+							${
+								item.cr_amt == 0
+								? "-"
+								: formatIndianCurrency(item.cr_amt)
+							}
+						</td>
+						<td class="num">
+							${
+								item.dr_amt == 0
+								? "-"
+								: formatIndianCurrency(item.dr_amt)
+							}
+						</td>
+						<td class="num">
+							${formatIndianCurrency(item.balance)}
+						</td>
+					</tr>
+				`);
 
-                        <td class="num"></td>
+			});
 
-                        <td class="num"></td>
+			rows.push(`
+				<tr class="summary-row">
+					<td colspan="2"></td>
+					<td class="num">
+						${formatIndianCurrency(lastItem.open_balance)}
+					</td>
+					<td class="num">
+						(-)${formatIndianCurrency(totCashIn)}
+					</td>
+					<td class="num">
+						${formatIndianCurrency(totCashOut)}
+					</td>
+					<td class="num">
+						${formatIndianCurrency(lastItem.balance)}
+					</td>
+				</tr>
+			`);
 
-                        <td class="num">
-                            ${formatIndianCurrency(item.open_balance)}
-                        </td>
+			body.innerHTML = rows.join("");
 
-                    </tr>
-                `);
-            }
+			document.getElementById("topOpening").innerHTML = formatIndianCurrency(data.transactions[0].open_balance);
+			document.getElementById("topCashIn").innerHTML  = formatIndianCurrency(totCashIn);
+			document.getElementById("topClosingOut").innerHTML = formatIndianCurrency(totCashOut);
+			document.getElementById("topClosing").innerHTML = formatIndianCurrency(lastItem.balance);
+		}
 
-            totCashIn += Number(item.cr_amt || 0);
-            totCashOut += Number(item.dr_amt || 0);
+		// --- Process Second Table: Item Stock Tracking Summaries ---
+		if (!data.itemsummary || data.itemsummary.length === 0) {
+			itemBody.innerHTML = `
+				<tr>
+					<td colspan="3" class="center">
+						No records.
+					</td>
+				</tr>
+			`;
+		} else {
+			const itemRows = [];
 
-            const notes =
-                (item.acc_notes || "")
-                .replaceAll(" • ", " • <wbr> ");
+			data.itemsummary.forEach(summaryItem => {
+				const codeStr = summaryItem.item_code || "-";
 
-            rows.push(`
+				itemRows.push(`
+					<tr>
+						<td class="fit-content">${codeStr}</td>
+						<td class="num fit-content">${summaryItem.StockIn == 0 ? "-" : formatIndianCurrency(summaryItem.StockIn)}</td>
+						<td class="num fit-content">${summaryItem.StockOut == 0 ? "-" : formatIndianCurrency(summaryItem.StockOut)}</td>
+					</tr>
+				`);
+			});
 
-                <tr>
+			itemBody.innerHTML = itemRows.join("");
+		}
 
-                    <td class="center">
-                        ${++i}
-                    </td>
+		setTimeout(() => {
+			window.print();
+		}, 300);
 
-                    <td class="nowrap">
-                        ${formatToIndianDate(item.acctran_date)}
-                    </td>
+	}
+	catch (err) {
 
-                    <td>
-                        ${notes}
-                    </td>
+		console.error(err);
 
-                    <td class="num">
-                        ${
-                            item.cr_amt == 0
-                            ? "-"
-                            : formatIndianCurrency(item.cr_amt)
-                        }
-                    </td>
-
-                    <td class="num">
-                        ${
-                            item.dr_amt == 0
-                            ? "-"
-                            : formatIndianCurrency(item.dr_amt)
-                        }
-                    </td>
-
-                    <td class="num">
-                        ${formatIndianCurrency(item.balance)}
-                    </td>
-
-                </tr>
-
-            `);
-
-        });
-
-        rows.push(`
-
-            <tr class="summary-row">
-
-                <td colspan="2"></td>
-
-                <td class="num">
-                    ${formatIndianCurrency(lastItem.open_balance)}
-                </td>
-
-                <td class="num">
-                    (-)${formatIndianCurrency(totCashIn)}
-                </td>
-
-                <td class="num">
-                    ${formatIndianCurrency(totCashOut)}
-                </td>
-
-                <td class="num">
-                    ${formatIndianCurrency(lastItem.balance)}
-                </td>
-
-            </tr>
-
-        `);
-
-        body.innerHTML = rows.join("");
-
-        // Populate the summary card records
-        document.getElementById("topOpening").innerHTML = formatIndianCurrency(data.transactions[0].open_balance);
-        document.getElementById("topCashIn").innerHTML  = formatIndianCurrency(totCashIn);
-        document.getElementById("topClosingOut").innerHTML = formatIndianCurrency(totCashOut);
-        document.getElementById("topClosing").innerHTML = formatIndianCurrency(lastItem.balance);
-
-    }
-    catch (err) {
-
-        console.error(err);
-
-        body.innerHTML = `
-            <tr>
-                <td colspan="6" class="center">
-                    Error loading report
-                </td>
-            </tr>
-        `;
-    }
+		body.innerHTML = `
+			<tr>
+				<td colspan="6" class="center">
+					Error loading report
+				</td>
+			</tr>
+		`;
+		
+		itemBody.innerHTML = `
+			<tr>
+				<td colspan="3" class="center">
+					Error.
+				</td>
+			</tr>
+		`;
+	}
 }
 
 window.addEventListener("load", loadReport);

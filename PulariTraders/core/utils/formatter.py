@@ -2,5 +2,5 @@
 
 def clean_decimal(value):
     if value in ["", None]:
-        return None
+        return 0
     return value

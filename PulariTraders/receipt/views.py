@@ -18,72 +18,65 @@ def get_next_receipt_no():
 
 
 def receipt(request, rid=None):
-
     if not rid:
-        rid = request.GET.get("rid");
+        rid = request.GET.get("rid")
 
-    receipt = None
+    receipt_obj = None
     account = None
 
-    # ================= CANCEL BILL =================
+    # ================= CANCEL RECEIPT =================
     if request.method == "POST" and request.POST.get("action") == "cancel":
-
         with transaction.atomic():
-
             rid = request.POST.get("rid")
+            receipt_obj = Receipt.objects.filter(rcpt_rid=rid).first()
 
-            Receipt.objects.filter(rcpt_rid=rid).update(
-                rcpt_status="Cancelled"
-            )
+            if receipt_obj and receipt_obj.rcpt_status != "Cancelled":
+                receipt_obj.rcpt_status = "Cancelled"
+                receipt_obj.save()
 
-            with connection.cursor() as cursor:
-                cursor.callproc('post_receipt', [receipt.rcpt_rid])
+                with connection.cursor() as cursor:
+                    cursor.callproc('post_receipt', [receipt_obj.rcpt_rid])
 
         messages.success(request, "Receipt cancelled successfully ❌")
-
         return redirect(f"/receipt/{rid}/")
 
-    # ================= LOAD BILL =================
-    if rid:
-        receipt = Receipt.objects.filter(rcpt_rid=rid).first()
-
-        if receipt:
-            account = Account.objects.get(acc_rid=receipt.rcpt_acc_rid)
-
-    else:
-        receipt = Receipt.empty()
-
-    accounts = Account.objects.filter().values(
-        'acc_rid', 'acc_disp_name', 'acc_name',
-        'acc_place', 'acc_phone', 'acc_address', 'acc_code'
-    )
-
-    # ================= SAVE BILL =================
-    if request.method == "POST":
-
+    # ================= SAVE RECEIPT =================
+    elif request.method == "POST":
         with transaction.atomic():
-
-            receipt = Receipt.objects.create(
+            receipt_obj = Receipt.objects.create(
                 rcpt_status='Active',
                 rcpt_no=get_next_receipt_no(),
                 rcpt_date=request.POST.get("rcpt_date"),
                 rcpt_amt=clean_decimal(request.POST.get("rcpt_amt") or 0),
-                rcpt_acc_rid=request.POST.get("rcpt_acc_rid"),
+                rcpt_acc_rid=int(request.POST.get("rcpt_acc_rid") or 0),
                 rcpt_notes=request.POST.get("rcpt_notes"),
                 rcpt_created_date=date.today(),
                 rcpt_modified_date=date.today()
             )
 
             with connection.cursor() as cursor:
-                cursor.callproc('post_receipt', [receipt.rcpt_rid])
+                cursor.callproc('post_receipt', [receipt_obj.rcpt_rid])
 
-        messages.success(request, f"Receipt {receipt.rcpt_no} saved successfully ✅")
+        messages.success(request, f"Receipt {receipt_obj.rcpt_no} saved successfully ✅")
+        return redirect(f"/receipt/{receipt_obj.rcpt_rid}/")
 
-        return redirect(f"/receipt/{receipt.rcpt_rid}/")
+    # ================= LOAD RECEIPT (GET) =================
+    if rid:
+        receipt_obj = Receipt.objects.filter(rcpt_rid=rid).first()
+
+        if receipt_obj:
+            account = Account.objects.get(acc_rid=receipt_obj.rcpt_acc_rid)
+    else:
+        receipt_obj = Receipt.empty()
+
+    accounts = Account.objects.filter().values(
+        'acc_rid', 'acc_disp_name', 'acc_name',
+        'acc_place', 'acc_phone', 'acc_address', 'acc_code'
+    )
 
     return render(request, 'receipt/receipt.html', {
         'accounts': list(accounts),
         'today': date.today(),
-        'receipt': receipt,
+        'receipt': receipt_obj,
         'account': account
     })

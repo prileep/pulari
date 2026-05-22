@@ -1,92 +1,85 @@
-
 <!-- <table style="width: 100%; border-top: 1px solid #ccc; margin-top: 10px;"> -->
 <table class="boxShape entryForm" id="accountTable">
-        <tr>
-          <td style="width: 1%;"></td>
-          <td style="width: 64%;"></td>
-          <td style="width:19%; text-align:right;">Total Amount&nbsp;</td>
-          <td style="width: 1%;"></td>
-          <td style="width:14%; text-align:right;"> 
-
-          <input type="number" step="0.01"
-          id="br_amount"
-          name="br_amount"
-
-          value="{{ bill_return_header.br_amount|default:''}}"
-          class="form-control form-control-sm price text-end"
-          readonly tabindex="-1">
-          </td>
+    <tr>
         <td style="width: 1%;"></td>
-      
+        <td style="width: 64%;"></td>
+        <td style="width: 19%; text-align: right;">Total Amount&nbsp;</td>
+        <td style="width: 1%;"></td>
+        <td style="width: 14%; text-align: right;">
+            <input type="number" 
+                   step="0.01" 
+                   id="br_amount" 
+                   name="br_amount"
+                   value="{{ bill_return_header.br_amount|default:'' }}"
+                   class="form-control form-control-sm price text-end" 
+                   readonly 
+                   tabindex="-1">
+        </td>
+        <td style="width: 1%;"></td>
     </tr>
     <tr>
-          <td></td>
-          <td></td>
-          <td style="text-align:right;">Adjustment (-)&nbsp;</td>
-          <td></td>
-          <td style="text-align:right;"> 
-
-          <input type="number" step="0.01"
-          id="br_discount" name="br_discount"
-
-          value="{{ bill_return_header.br_discount|default:''}}"
-          class="form-control form-control-sm price text-end" readonly tabindex="-1">
-          </td>
         <td></td>
-      
+        <td></td>
+        <td style="text-align: right;">Adjustment (-)&nbsp;</td>
+        <td></td>
+        <td style="text-align: right;">
+            <input type="number" 
+                   step="0.01" 
+                   id="br_discount" 
+                   name="br_discount"
+                   value="{{ bill_return_header.br_discount|default:'' }}"
+                   class="form-control form-control-sm price text-end" 
+                   readonly 
+                   tabindex="-1">
+        </td>
+        <td></td>
     </tr>
     <tr>
-          <td></td>
-          <td class="info">
+        <td></td>
+        <td class="info">
             <span id="br_net_amount_words"></span>
-          </td>
-          <td style="text-align:right;">Net Amount (Payable)&nbsp;</td>
-          <td></td>
-          <td style="text-align:right;"> 
-
-            <input type="number" step="0.01"
-            id="br_net_amount"
-            name="br_net_amount"
-
-            value="{{ bill_return_header.br_net_amount|default:''}}"
-            class="form-control form-control-sm price text-end"
-            onchange="adjustAmount()"
-            tabindex="-1"
-            {% if bill_return_header.br_bill_return_no %}
-              readonly
-            {% endif%}
-            >
-          </td>
+        </td>
+        <td style="text-align: right;">Net Amount (Payable)&nbsp;</td>
         <td></td>
-      
+        <td style="text-align: right;">
+            <input type="number" 
+                   step="0.01" 
+                   id="br_net_amount" 
+                   name="br_net_amount"
+                   value="{{ bill_return_header.br_net_amount|default:'' }}"
+                   class="form-control form-control-sm price text-end"
+                   onchange="adjustAmount()" 
+                   tabindex="-1"
+                   {% if bill_return_header.br_bill_return_no %}readonly{% endif %}>
+        </td>
+        <td></td>
     </tr>
 </table>
-<table style="width:100%; margin-top:10px;">
-  <tr>
-    <td></td>
-    <td style="width: 1%;"></td>
-    <td style="width: 14%;">
-      {% if bill_return_header.br_rid and bill_return_header.br_status != 'Cancelled' %}
-        <input type="hidden" name="rid" value="{{ bill_return_header.br_rid }}">
 
-        <button type="submit" 
-                name="action" 
-                value="cancel"
-                formaction="/billreturn/"
-                class="searchLink"
-                style="background: none; border: none; padding: 0; cursor: pointer;"
-                onclick="return confirm('Are you sure to cancel this Bill Return?');">
-          Cancel this Bill Return
-        </button>
-      {% endif %}
-    </td>
-    <td style="text-align: right; width: 84%;">
-      {% if bill_return_header.br_rid %}
-        
-      {% else %}
-        <button type="submit" class="submitButton">Submit</button>&nbsp;
-      {% endif %}
-     <button type="button" onclick="window.location.href='/billreturn'" class="submitButton">Clear</button> </td>
-    <td style="width: 1%;"></td>
-  </tr>
+<table style="width: 100%; margin-top: 10px;">
+    <tr>
+        <td></td>
+        <td style="width: 1%;"></td>
+        <td style="width: 14%;">
+            {% if bill_return_header.br_rid and bill_return_header.br_status != 'Cancelled' %}
+                <input type="hidden" name="rid" value="{{ bill_return_header.br_rid }}">
+                <button type="submit" 
+                        name="action" 
+                        value="cancel"
+                        formaction="/billreturn/"
+                        class="searchLink"
+                        style="background: none; border: none; padding: 0; cursor: pointer;"
+                        onclick="return confirm('Are you sure to cancel this Bill Return?');">
+                    Cancel this Bill Return
+                </button>
+            {% endif %}
+        </td>
+        <td style="text-align: right; width: 84%;">
+            {% if not bill_return_header.br_rid %}
+                <button type="submit" class="submitButton">Submit</button>&nbsp;
+            {% endif %}
+            <button type="button" onclick="window.location.href='/billreturn'" class="submitButton">Clear</button>
+        </td>
+        <td style="width: 1%;"></td>
+    </tr>
 </table>

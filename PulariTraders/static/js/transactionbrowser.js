@@ -107,6 +107,10 @@ document.addEventListener("DOMContentLoaded", function () {
                         getInputFromRowById(newRow, 'tdAccount').innerHTML = item.acc_name;
 
                         getInputFromRowById(newRow, 'tdType').innerHTML = item.acctran_ref_type;
+                        if (item.acctran_status == 'Cancelled') {
+                            getInputFromRowById(newRow, 'tdType').style.color = "red";
+                            newRow.style.color = "red";
+                        }
                         // This removes all spaces, transforming "Bill Return" into "billreturn"
                         const pathType = item.acctran_ref_type.toLowerCase().replace(/\s+/g, '');
                         getInputFromRowById(newRow, 'tdType').href = `/${pathType}/${item.acctran_ref_rid}/`

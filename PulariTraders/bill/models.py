@@ -15,6 +15,8 @@ class BillHeader(models.Model):
     bh_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     bh_discount = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     bh_net_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    bh_rcpt_rid = models.IntegerField()
+    bh_rcpt_no = models.CharField(max_length=12)
     bh_created_date = models.DateTimeField(auto_now_add=True)
     bh_modified_date = models.DateTimeField(auto_now=True)
 

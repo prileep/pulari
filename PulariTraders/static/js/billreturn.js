@@ -118,9 +118,12 @@ document.addEventListener("blur", function (e) {
 
 function calculateBillReturn() {
 
+
+
     let brd_qty = document.getElementsByName("brd_qty");
     let brd_amount = document.getElementsByName("brd_amount");
     let brd_total_amount = document.getElementsByName("brd_total_amount");
+    let amountErrorspnAmountError = document.getElementsByName("spnAmountError");
     let grandTotal = parseFloat(0);
 
     for (let i = 0; i < brd_qty.length; i++) {
@@ -134,6 +137,17 @@ function calculateBillReturn() {
             brd_total_amount[i].value = total.toFixed(2);
         }
         grandTotal = (grandTotal + total);
+
+        if (i == (brd_qty.length - 1)) {
+            amountErrorspnAmountError[i].classList.remove("validationError");
+            amountErrorspnAmountError[i].classList.add("hidden");
+        } else if (amount <= 0) {
+            amountErrorspnAmountError[i].classList.remove("hidden");
+            amountErrorspnAmountError[i].classList.add("validationError");
+        } else {
+            amountErrorspnAmountError[i].classList.remove("validationError");
+            amountErrorspnAmountError[i].classList.add("hidden");
+        }
     }
 
     let br_amount = grandTotal;

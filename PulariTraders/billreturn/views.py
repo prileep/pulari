@@ -22,7 +22,7 @@ def billreturn(request, rid=None):
     if not rid:
         rid = request.GET.get("rid")
 
-    bill_return_header = None
+    bill_return_header = BillReturnHeader.empty();
     bill_return_details = []
     account = None
 
