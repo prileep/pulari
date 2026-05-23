@@ -41,6 +41,9 @@ urlpatterns = [
 
     path('transactionbrowser/',include('transactionbrowser.urls')),
 
+    path('report/',include('report.urls')),
+    path('Report/',include('report.urls')),
+
     path('receipt/',include('receipt.urls')),
     path('Receipt/',include('receipt.urls')),   # optional alias
 

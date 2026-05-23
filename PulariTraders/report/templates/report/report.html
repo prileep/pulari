@@ -1,0 +1,103 @@
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block content %}
+{% csrf_token %}
+
+<table class="boxShape entryForm" id="transactionBrowserTable" style="width: 50%;">
+    <tr class="formHeader">
+        <td></td>
+        <td colspan="11" style="text-align: left;">Reports</td>
+        <td></td>
+    </tr>
+
+    <tr>
+        <td style="width: 1%;"></td>
+        <td style="width: 19%;">Report Name</td>
+        <td style="width: 1%;"></td>
+        <td style="width: 78%;">
+            <select id="report_name" name="report_name" class="form-control form-control-sm">
+                <option value="Stock Transaction">Stock Transaction</option>
+                <option value="Balance Sheet">Balance Sheet</option>
+                <option value="Overdue Accounts">Overdue Accounts</option>
+            </select>
+        </td>
+        <td style="width: 1%;"></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td>Date</td>
+        <td></td>
+        <td>
+            <table>
+                <tr>
+                    <td style="width: 45%;">
+                        <input type="date" 
+                               id="tran_from_date" 
+                               name="tran_from_date" 
+                               value="{{ today|date:'Y-m-d' }}" 
+                               class="form-control form-control-sm">
+                    </td>
+                    <td style="width: 10%; text-align: center;">To</td>
+                    <td style="width: 45%;">
+                        <input type="date" 
+                               id="tran_to_date" 
+                               name="tran_to_date" 
+                               value="{{ today|date:'Y-m-d' }}" 
+                               class="form-control form-control-sm">
+                    </td>
+                </tr>
+            </table>
+        </td>
+        <td></td>
+    </tr>
+
+    <tr>
+        <td></td>
+        <td>Account</td>
+        <td></td>
+        <td>
+            <input type="text" 
+                   id="tran_account" 
+                   name="tran_account" 
+                   class="form-control form-control-sm" 
+                   autocomplete="off">
+            <input type="hidden" id="tran_account_rid" name="tran_account_rid">
+            <div id="suggestionBox" class="suggestion-box"></div>
+        </td>
+        <td></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td>Transaction</td>
+        <td></td>
+        <td>
+            <select id="acctran_ref_type" name="acctran_ref_type" class="form-control form-control-sm" style="width: 50%;">
+                <option value=""></option>
+                <option value="Bill">Bill</option>
+                <option value="Bill Return">Bill Return</option>
+                <option value="Receipt">Receipt</option>
+                <option value="Payment">Payment</option>
+                <option value="Discount">Discount</option>
+                <option value="Purchase">Purchase</option>
+                <option value="Purchase Return">Purchase Return</option>
+            </select>
+        </td>
+        <td></td>
+    </tr>
+</table>
+
+<table style="width: 50%;">
+    <tr>
+        <td style="text-align: right;">
+            <a href="#" id="transactionPrintBtn" class="searchLink" style="font-size: larger;" onclick="printReport()">
+                Print
+            </a>
+        </td>
+    </tr>
+</table>
+
+{{ accounts|json_script:"accounts-data" }}
+
+<script src="{% static 'js/report.js' %}"></script>
+{% endblock %}

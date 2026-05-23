@@ -83,7 +83,8 @@ INSTALLED_APPS = [
     'transactionbrowser',
     'receipt',
     'discount',
-    'payment'
+    'payment',
+    'report'
 ]
 
 MIDDLEWARE = [

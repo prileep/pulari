@@ -132,6 +132,18 @@
                     </a>
                 </li>
 
+                <!-- ✅ SEPARATOR -->
+                <li class="nav-item d-flex align-items-center">
+                    <div class="menu-separator"></div>
+                </li>
+
+                <!-- SEARCH -->
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'report' %}active-menu{% endif %}" href="{% url 'report' %}">
+                        Reports
+                    </a>
+                </li>
+
             </ul>
         </div>
     </div>

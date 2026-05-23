@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Report Print Preview</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            color: #333;
+            margin: 25px;
+            font-size: 13px;
+        }
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #222;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .header h2 { margin: 0; text-transform: uppercase; }
+        .meta-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        .report-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .report-table th, .report-table td {
+            border: 1px solid #cccccc;
+            padding: 6px 8px;
+            text-align: left;
+        }
+        .report-table th {
+            background-color: #eaeaea;
+            font-size: 11px;
+            text-transform: uppercase;
+        }
+        .num-col { text-align: right !important; }
+        .center-col { text-align: center; }
+        
+        /* Section styling rules */
+        .item-section-header {
+            background-color: #f9f9f9;
+            font-weight: bold;
+            font-size: 12px;
+            color: #004499;
+        }
+        .subtotal-row {
+            font-weight: bold;
+            background-color: #f5f5f5;
+        }
+
+        .control-panel {
+            background: #f4f4f4;
+            padding: 12px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        .btn {
+            background-color: #0066cc;
+            color: #fff;
+            border: none;
+            padding: 6px 14px;
+            cursor: pointer;
+            font-weight: bold;
+            border-radius: 3px;
+        }
+        @media print {
+            .control-panel { display: none !important; }
+            body { margin: 0; font-size: 11px; }
+            tr { page-break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="control-panel">
+        <span><strong>Print Preview Mode</strong> — Confirm records look correct before running layout print.</span>
+        <button class="btn" onclick="window.print()">Print Document</button>
+    </div>
+
+    <div class="header">
+        <h2 id="reportTitle">Report</h2>    
+    </div>
+
+    <div class="meta-bar">
+        <div id="metaDates">Date Coverage: All Records</div>
+        <div id="metaTimestamp"></div>
+    </div>
+
+    <table class="report-table">
+        <thead>
+            <tr>
+                <th style="width: 6%;">Sl No</th>
+                <th style="width: 14%;">Date</th>
+                <th style="width: 44%;">Account Display Name</th>
+                <th style="width: 12%;">Type</th>
+                <th class="num-col" style="width: 8%;">In Qty</th>
+                <th class="num-col" style="width: 8%;">Out Qty</th>
+                <th class="num-col" style="width: 12%;">Amount</th>
+            </tr>
+        </thead>
+        <tbody id="printContent">
+            <tr>
+                <td colspan="7" class="center-col">Loading report records...</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Fill processing runtime generation timestamp
+            document.getElementById("metaTimestamp").innerText = "Printed: " + new Date().toLocaleString();
+
+            // Extract values out from local storage cache memory strings
+            const records = JSON.parse(localStorage.getItem("print_report_payload"));
+            const metadata = JSON.parse(localStorage.getItem("print_report_metadata")) || {};
+
+            if (metadata.report_name) {
+                document.getElementById("reportTitle").innerText = metadata.report_name;
+            }
+            if (metadata.from_date || metadata.to_date) {
+                document.getElementById("metaDates").innerText = `Date Range: ${metadata.from_date || 'Start'} To ${metadata.to_date || 'End'}`;
+            }
+
+            const tbody = document.getElementById("printContent");
+            tbody.innerHTML = "";
+
+            if (!records || records.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="center-col">No data rows found matching the filter query parameters.</td></tr>`;
+                return;
+            }
+
+            // Helper function to turn zero quantities into dashes
+            function formatQty(val) {
+                const num = Number(val || 0);
+                return num === 0 ? "-" : num;
+            }
+
+            // 1. Structural Grouping by Item Code
+            const sections = {};
+            records.forEach(row => {
+                const itemCode = row.item_code || "UNKNOWN ITEM";
+                if (!sections[itemCode]) {
+                    sections[itemCode] = [];
+                }
+                sections[itemCode].push(row);
+            });
+
+            // 2. Render sections sequentially with custom Headers and Subtotals
+            Object.keys(sections).forEach(itemCode => {
+                // Append Section Header Row spanning across all columns
+                const headerTr = document.createElement("tr");
+                headerTr.className = "item-section-header";
+                headerTr.innerHTML = `<td colspan="7">Item Code: ${itemCode}</td>`;
+                tbody.appendChild(headerTr);
+
+                let runningSerial = 1;
+                let subtotalIn = 0;
+                let subtotalOut = 0;
+                let subtotalAmount = 0;
+
+                // --- SORT ROWS WITHIN SECTION BY STOCK_IN DESCENDING ---
+                sections[itemCode].sort((a, b) => {
+                    const qtyA = Number(a.stock_in || 0);
+                    const qtyB = Number(b.stock_in || 0);
+                    return qtyB - qtyA; // Sort descending
+                });
+
+                // Append sorted item detail transaction data rows
+                sections[itemCode].forEach(row => {
+                    const dataIn = Number(row.stock_in || 0);
+                    const dataOut = Number(row.stock_out || 0);
+                    const dataAmount = Number(row.item_tot_amt || 0);
+
+                    // Accumulate totals for the section
+                    subtotalIn += dataIn;
+                    subtotalOut += dataOut;
+                    subtotalAmount += dataAmount;
+
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = `
+                        <td class="center-col">${runningSerial++}</td>
+                        <td>${row.trans_date || ''}</td>
+                        <td>${row.acc_disp_name || ''}</td>
+                        <td>${row.acctran_ref_type || ''}</td>
+                        <td class="num-col">${formatQty(row.stock_in)}</td>
+                        <td class="num-col">${formatQty(row.stock_out)}</td>
+                        <td class="num-col">${parseFloat(row.item_tot_amt).toFixed(2)}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+                // Append Section Summary Subtotal Row formatted as: [itemCode] (Total)
+                const subtotalTr = document.createElement("tr");
+                subtotalTr.className = "subtotal-row";
+                subtotalTr.innerHTML = `
+                    <td colspan="4" style="text-align: right;">${itemCode} (Total)</td>
+                    <td class="num-col">${formatQty(subtotalIn)}</td>
+                    <td class="num-col">${formatQty(subtotalOut)}</td>
+                    <td class="num-col">${subtotalAmount.toFixed(2)}</td>
+                `;
+                tbody.appendChild(subtotalTr);
+            });
+        });
+    </script>
+</body>
+</html>
