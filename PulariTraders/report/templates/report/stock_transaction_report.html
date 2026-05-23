@@ -12,20 +12,30 @@
         }
         .header {
             text-align: center;
-            border-bottom: 2px solid #222;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
+            padding-bottom: 5px;
+            margin-bottom: 5px;
         }
         .header h2 { margin: 0; text-transform: uppercase; }
+        
         .meta-bar {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             font-weight: bold;
+            font-size: 12px;
+            border-bottom: 2px solid #222; 
+            padding-bottom: 8px;
         }
+        
         .report-table {
             width: 100%;
             border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+        .pivot-table {
+            width: 60% !important;
+            margin-bottom: 40px;
+            margin-left: auto; 
         }
         .report-table th, .report-table td {
             border: 1px solid #cccccc;
@@ -94,33 +104,44 @@
         <div id="metaTimestamp"></div>
     </div>
 
-    <table class="report-table">
+    <!-- Pivot Matrix View Block (Grand Total Row Removed) -->
+    <table class="report-table pivot-table">
         <thead>
             <tr>
-                <th style="width: 6%;">Sl No</th>
-                <th style="width: 14%;">Date</th>
-                <th style="width: 44%;">Account Display Name</th>
-                <th style="width: 12%;">Type</th>
-                <th class="num-col" style="width: 8%;">In Qty</th>
-                <th class="num-col" style="width: 8%;">Out Qty</th>
-                <th class="num-col" style="width: 12%;">Amount</th>
+                <th style="width: 28%;">Item Code</th>
+                <th class="num-col" style="width: 15%;">Stock In</th>
+                <th class="num-col" style="width: 21%;">Stock In Amount</th>
+                <th class="num-col" style="width: 15%;">Stock Out</th>
+                <th class="num-col" style="width: 21%;">Stock Out Amt</th>
             </tr>
         </thead>
+        <tbody id="pivotContent">
+            <tr>
+                <td colspan="5" class="center-col">Generating matrix view summaries...</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- Main Itemized Transaction Split Table -->
+    <table class="report-table">
         <tbody id="printContent">
             <tr>
-                <td colspan="7" class="center-col">Loading report records...</td>
+                <td id="initialLoadingCell" colspan="8" class="center-col">Loading report records...</td>
             </tr>
         </tbody>
     </table>
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            // Fill processing runtime generation timestamp
             document.getElementById("metaTimestamp").innerText = "Printed: " + new Date().toLocaleString();
 
-            // Extract values out from local storage cache memory strings
             const records = JSON.parse(localStorage.getItem("print_report_payload"));
             const metadata = JSON.parse(localStorage.getItem("print_report_metadata")) || {};
+
+            let isSameDate = false;
+            if (metadata.from_date && metadata.to_date && metadata.from_date.trim() === metadata.to_date.trim()) {
+                isSameDate = true;
+            }
 
             if (metadata.report_name) {
                 document.getElementById("reportTitle").innerText = metadata.report_name;
@@ -130,17 +151,24 @@
             }
 
             const tbody = document.getElementById("printContent");
+            const pivotTbody = document.getElementById("pivotContent");
+            
             tbody.innerHTML = "";
+            pivotTbody.innerHTML = "";
+
+            const totalCols = isSameDate ? 7 : 8;
 
             if (!records || records.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="center-col">No data rows found matching the filter query parameters.</td></tr>`;
+                const noDataRow = `<tr><td colspan="${totalCols}" class="center-col">No data rows found matching the filter query parameters.</td></tr>`;
+                tbody.innerHTML = noDataRow;
+                pivotTbody.innerHTML = `<tr><td colspan="5" class="center-col">No summary records compiled.</td></tr>`;
                 return;
             }
 
-            // Helper function to turn zero quantities into dashes
-            function formatQty(val) {
+            function formatVal(val) {
                 const num = Number(val || 0);
-                return num === 0 ? "-" : num;
+                if (num === 0) return "-";
+                return num.toFixed(2); 
             }
 
             // 1. Structural Grouping by Item Code
@@ -153,60 +181,101 @@
                 sections[itemCode].push(row);
             });
 
-            // 2. Render sections sequentially with custom Headers and Subtotals
+            const pivotSummary = {};
+
+            // 2. Process Sections and Accumulate Pivot Values
             Object.keys(sections).forEach(itemCode => {
-                // Append Section Header Row spanning across all columns
                 const headerTr = document.createElement("tr");
                 headerTr.className = "item-section-header";
-                headerTr.innerHTML = `<td colspan="7">Item Code: ${itemCode}</td>`;
+                headerTr.innerHTML = `<td colspan="${totalCols}">Item Code: ${itemCode}</td>`;
                 tbody.appendChild(headerTr);
 
                 let runningSerial = 1;
-                let subtotalIn = 0;
-                let subtotalOut = 0;
-                let subtotalAmount = 0;
+                let subtotalInQty = 0;
+                let subtotalOutQty = 0;
+                let subtotalAmtIn = 0;
+                let subtotalAmtOut = 0;
 
-                // --- SORT ROWS WITHIN SECTION BY STOCK_IN DESCENDING ---
                 sections[itemCode].sort((a, b) => {
                     const qtyA = Number(a.stock_in || 0);
                     const qtyB = Number(b.stock_in || 0);
-                    return qtyB - qtyA; // Sort descending
+                    return qtyB - qtyA;
                 });
 
-                // Append sorted item detail transaction data rows
                 sections[itemCode].forEach(row => {
-                    const dataIn = Number(row.stock_in || 0);
-                    const dataOut = Number(row.stock_out || 0);
-                    const dataAmount = Number(row.item_tot_amt || 0);
+                    const dataInQty = Number(row.stock_in || 0);
+                    const dataOutQty = Number(row.stock_out || 0);
+                    const rawAmount = Math.abs(Number(row.item_tot_amt || 0));
 
-                    // Accumulate totals for the section
-                    subtotalIn += dataIn;
-                    subtotalOut += dataOut;
-                    subtotalAmount += dataAmount;
+                    let displayAmtIn = 0;
+                    let displayAmtOut = 0;
+
+                    if (dataInQty > 0) {
+                        displayAmtIn = rawAmount;
+                        displayAmtOut = 0;
+                    } else if (dataOutQty > 0) {
+                        displayAmtIn = 0;
+                        displayAmtOut = rawAmount;
+                    }
+
+                    subtotalInQty += dataInQty;
+                    subtotalOutQty += dataOutQty;
+                    subtotalAmtIn += displayAmtIn;
+                    subtotalAmtOut += displayAmtOut;
+
+                    let rowHtml = `<td class="center-col" style="width: 5%;">${runningSerial++}</td>`;
+                    
+                    if (!isSameDate) {
+                        rowHtml += `<td style="width: 11%;">${row.trans_date || ''}</td>`;
+                        rowHtml += `<td style="width: 36%;">${row.acc_disp_name || ''}</td>`;
+                    } else {
+                        rowHtml += `<td style="width: 47%;">${row.acc_disp_name || ''}</td>`; 
+                    }
+
+                    rowHtml += `
+                        <td style="width: 12%;">${row.acctran_ref_type || ''}</td>
+                        <td class="num-col" style="width: 9%;">${formatVal(dataInQty)}</td>
+                        <td class="num-col" style="width: 9%;">${formatVal(displayAmtIn)}</td>
+                        <td class="num-col" style="width: 9%;">${formatVal(dataOutQty)}</td>
+                        <td class="num-col" style="width: 9%;">${formatVal(displayAmtOut)}</td>
+                    `;
 
                     const tr = document.createElement("tr");
-                    tr.innerHTML = `
-                        <td class="center-col">${runningSerial++}</td>
-                        <td>${row.trans_date || ''}</td>
-                        <td>${row.acc_disp_name || ''}</td>
-                        <td>${row.acctran_ref_type || ''}</td>
-                        <td class="num-col">${formatQty(row.stock_in)}</td>
-                        <td class="num-col">${formatQty(row.stock_out)}</td>
-                        <td class="num-col">${parseFloat(row.item_tot_amt).toFixed(2)}</td>
-                    `;
+                    tr.innerHTML = rowHtml;
                     tbody.appendChild(tr);
                 });
 
-                // Append Section Summary Subtotal Row formatted as: [itemCode] (Total)
                 const subtotalTr = document.createElement("tr");
                 subtotalTr.className = "subtotal-row";
                 subtotalTr.innerHTML = `
-                    <td colspan="4" style="text-align: right;">${itemCode} (Total)</td>
-                    <td class="num-col">${formatQty(subtotalIn)}</td>
-                    <td class="num-col">${formatQty(subtotalOut)}</td>
-                    <td class="num-col">${subtotalAmount.toFixed(2)}</td>
+                    <td colspan="${isSameDate ? 3 : 4}" style="text-align: right;">${itemCode} (Total)</td>
+                    <td class="num-col">${formatVal(subtotalInQty)}</td>
+                    <td class="num-col">${formatVal(subtotalAmtIn)}</td>
+                    <td class="num-col">${formatVal(subtotalOutQty)}</td>
+                    <td class="num-col">${formatVal(subtotalAmtOut)}</td>
                 `;
                 tbody.appendChild(subtotalTr);
+
+                pivotSummary[itemCode] = {
+                    stock_in: subtotalInQty,
+                    stock_in_amt: subtotalAmtIn,
+                    stock_out: subtotalOutQty,
+                    stock_out_amt: subtotalAmtOut
+                };
+            });
+
+            // 3. Render Pivot Rows dynamically using pivotSummary data map
+            Object.keys(pivotSummary).forEach(itemCode => {
+                const itemData = pivotSummary[itemCode];
+                const pTr = document.createElement("tr");
+                pTr.innerHTML = `
+                    <td><strong>${itemCode}</strong></td>
+                    <td class="num-col">${formatVal(itemData.stock_in)}</td>
+                    <td class="num-col">${formatVal(itemData.stock_in_amt)}</td>
+                    <td class="num-col">${formatVal(itemData.stock_out)}</td>
+                    <td class="num-col">${formatVal(itemData.stock_out_amt)}</td>
+                `;
+                pivotTbody.appendChild(pTr);
             });
         });
     </script>
