@@ -1,43 +1,54 @@
+document.getElementById("reportForm").addEventListener("submit", function (event) {
+    const reportNameSelect = document.getElementById("report_name");
+
+    // Check if a report name has been selected
+    if (!reportNameSelect || !reportNameSelect.value) {
+        // Stop the form from submitting and opening a blank tab
+        event.preventDefault();
+        alert("Please select a Report Name before generating the report.");
+
+        if (reportNameSelect) {
+            reportNameSelect.focus();
+        }
+    }
+    // If validation passes, no event.preventDefault() is called, 
+    // and the native submission runs automatically.
+});
+
+// If you are calling it manually from a utility function, 
+// make sure to perform the same validation check before submitting.
 function printReport() {
-    // Collect the parameter values cleanly from DOM inputs
-    const reportName = document.getElementById("report_name")?.value || "";
-    const fromDate = document.getElementById("tran_from_date")?.value || "";
-    const toDate = document.getElementById("tran_to_date")?.value || "";
-    const itemRid = document.getElementById("tran_item_rid")?.value || "0";
-    const accountRid = document.getElementById("tran_account_rid")?.value || "0";
-    const refType = document.getElementById("acctran_ref_type")?.value || "";
+    const reportNameSelect = document.getElementById("report_name");
 
-    // Build standard URL parameters query string securely
-    const queryParams = new URLSearchParams({
-        report_name: reportName,
-        tran_from_date: fromDate,
-        tran_to_date: toDate,
-        tran_item_rid: itemRid,
-        tran_account_rid: accountRid,
-        acctran_ref_type: refType
-    });
+    if (!reportNameSelect || !reportNameSelect.value) {
+        alert("Please select a Report Name before generating the report.");
+        if (reportNameSelect) reportNameSelect.focus();
+        return; // Halt execution
+    }
 
-    // Request fresh data matching these variables via JSON endpoint
-    fetch(`/report/generate_report/?${queryParams.toString()}`)
-        .then(response => response.json())
-        .then(data => {
-            if (data.details) {
-                // Cache data to localStorage so the raw print window can extract it immediately
-                localStorage.setItem("print_report_payload", JSON.stringify(data.details));
-                localStorage.setItem("print_report_metadata", JSON.stringify({
-                    report_name: reportName,
-                    from_date: fromDate,
-                    to_date: toDate
-                }));
-
-                // Open the clean print layout template in a separate workspace tab
-                window.open("/report/print_preview/", "_blank");
-            } else {
-                alert("No structural data found for the current query criteria.");
-            }
-        })
-        .catch(error => {
-            console.error("Report extraction processing failure:", error);
-            alert("Could not process your printing query request at this time.");
-        });
+    document.getElementById("reportForm").submit();
 }
+
+document.addEventListener("DOMContentLoaded", function () {
+    const dataEl = document.getElementById("accounts-data");
+    const accounts = dataEl ? JSON.parse(dataEl.textContent) : [];
+    const accountInput = document.getElementById("tran_account");
+
+    if (accountInput) {
+        inputAutocomplete(accountInput, accounts, "acc_disp_name", function (c) {
+            accountInput.value = c.acc_disp_name;
+            document.getElementById("tran_account_rid").value = c.acc_rid;
+        });
+    }
+
+    const itemsData = document.getElementById("items-data");
+    const items = itemsData ? JSON.parse(itemsData.textContent) : [];
+    const itemInput = document.getElementById("tran_item");
+
+    if (itemInput) {
+        inputAutocomplete(itemInput, items, "item_display_name", function (c) {
+            itemInput.value = c.item_display_name;
+            document.getElementById("tran_item_rid").value = c.item_rid;
+        });
+    }
+});

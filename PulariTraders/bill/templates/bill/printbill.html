@@ -235,7 +235,13 @@
             <div><strong>(GST)</strong> Rs. 0.00/-</div>
         </div>
         <div class="summary-right">
-            <div><strong>Rs. (Total):</strong> {{ bill_header.bh_net_amount }}</div>
+            <div><strong>Rs. (Total):</strong>
+                {% if bill_header.bh_counter_sale == 1 %}
+                {{ bill_header.bh_amount }}
+            {% else %}
+                {{ bill_header.bh_net_amount }}
+            {% endif %}
+        </div>
         </div>
     </div>
 

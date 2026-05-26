@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Account Transaction Report - {{ report_type }}</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            color: #222;
+            background: #fff;
+        }
+
+        .page {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #333;
+            padding-bottom: 15px;
+        }
+
+        h2 {
+            margin: 0;
+            font-size: 22px;
+        }
+
+        .muted {
+            color: #777;
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        /* Container to line up summary elements horizontally on the right side */
+        .top-right-displays {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+            justify-content: flex-end;
+            width: 75%;
+        }
+
+        /* Pivot Base Table Styles */
+        .top-summary-pivot {
+            border-collapse: collapse;
+            font-size: 11px;
+            margin-bottom: 0;
+            width: auto; /* Allow layout engine to auto-size based on cell constraints */
+        }
+        
+        .top-summary-pivot th, 
+        .top-summary-pivot td {
+            padding: 5px 8px;
+            border: 1px solid #cfcfcf;
+            white-space: nowrap; /* Prevent internal wrapping so columns can achieve true minimum width */
+        }
+        
+        .top-summary-pivot thead th {
+            background: #f3f3f3;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .top-summary-pivot tbody th {
+            background: #f8f9fa;
+            font-weight: normal;
+            color: #444;
+            text-align: left;
+        }
+
+        .top-summary-pivot td {
+            text-align: right;
+        }
+
+        .top-summary-pivot .pivot-total-row th,
+        .top-summary-pivot .pivot-total-row td {
+            font-weight: bold;
+            background: #fafafa;
+        }
+
+        /* Force columns to collapse to the absolute minimum width of their contents */
+        .w-min {
+            width: 1%;
+        }
+
+        /* Section block wrappers */
+        .pivot-block {
+            display: flex;
+            flex-direction: column;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            border: 1px solid #cfcfcf;
+            padding: 8px 10px;
+            vertical-align: top;
+        }
+
+        th {
+            background: #f3f3f3;
+            text-align: left;
+        }
+
+        td.num, th.num {
+            text-align: right;
+            white-space: nowrap;
+        }
+
+        td.center, th.center {
+            text-align: center;
+        }
+
+        .nowrap {
+            white-space: nowrap;
+        }
+
+        .summary-row td {
+            font-weight: bold;
+            background: #fafafa;
+        }
+
+        .balance-info {
+            font-size: 13px;
+            margin-top: 5px;
+            font-weight: bold;
+        }
+
+        @media print {
+            body { margin: 0; }
+            .page { max-width: none; margin: 0; }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="page">
+
+    <div class="header">
+        <div>
+            <div id="filtersTextDisplay" style="font-size: 13px; line-height: 1.5; margin-top: 4px;">
+                <strong>ACCOUNT TRANSACTION REPORT</strong><br>
+                <strong>Period:</strong> 
+                {% if tran_from_date == tran_to_date %}
+                    {{ tran_from_date }}
+                {% else %}
+                    {{ tran_from_date }} to {{ tran_to_date }}
+                {% endif %}
+            </div>
+
+            {% if rows %}
+            <div class="balance-info">
+                Opening Balance: <span id="topOpeningBalance">0</span>
+            </div>
+            {% endif %}
+
+            <div class="muted" style="margin-top: 6px;">
+                Printed on: <span>{% now "d-m-Y h:i A" %}</span>
+            </div>
+        </div>
+
+        <div class="top-right-displays">
+            
+            <div class="pivot-block">
+                <table class="top-summary-pivot" id="pivotSummaryTable">
+                    <thead>
+                        <tr>
+                            <th class="w-min"></th> 
+                            <th class="w-min">Cash In</th>
+                            <th class="w-min">Cash Out</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% regroup rows by acctran_ref_type as ref_type_summary %}
+                        {% for group in ref_type_summary %}
+                            <tr class="pivot-data-row" data-ref-type="{{ group.grouper|default:'Other' }}">
+                                <th class="w-min">{{ group.grouper|default:"Other" }}</th>
+                                <td class="num pivot-in-cell w-min">0</td>
+                                <td class="num pivot-out-cell w-min">0</td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="3" class="center">- No Summary Data -</td></tr>
+                        {% endfor %}
+                        
+                        <tr class="pivot-total-row">
+                            <th class="w-min">Total</th>
+                            <td id="pivotGrandCashIn" class="w-min">-</td>
+                            <td id="pivotGrandCashOut" class="w-min">-</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            {% if stockTrans %}
+            <div class="pivot-block">
+                <table class="top-summary-pivot" id="stockPivotSummaryTable">
+                    <thead>
+                        <tr id="stockPivotHeaderRow">
+                            <th class="w-min">Item</th>
+                            </tr>
+                    </thead>
+                    <tbody id="stockPivotBody">
+                        </tbody>
+                </table>
+            </div>
+            {% endif %}
+
+        </div>
+    </div>
+
+    <table id="mainReportTable">
+        <thead>
+            <tr>
+                <th class="center" style="width: 5%;">#</th>
+                {% if tran_from_date != tran_to_date %}
+                    <th style="width: 10%;">Date</th>
+                    <th style="width: 12%;">Ref Type</th>
+                    <th style="width: 25%;">Account</th>
+                    <th style="width: 24%;">Notes</th>
+                {% else %}
+                    <th style="width: 12%;">Ref Type</th>
+                    <th style="width: 30%;">Account</th>
+                    <th style="width: 29%;">Notes</th>
+                {% endif %}
+                <th class="num" style="width: 12%;">Cash In</th>
+                <th class="num" style="width: 12%;">Cash Out</th>
+            </tr>
+        </thead>
+        <tbody id="reportBody">
+            {% for item in rows %}
+            <tr>
+                <td class="center">{{ item.slno }}</td>
+                {% if tran_from_date != tran_to_date %}
+                    <td class="nowrap">{{ item.acctran_date }}</td>
+                {% endif %}
+                <td>{{ item.acctran_ref_type }}</td>
+                <td>{{ item.acc_name }}</td>
+                <td>{{ item.acc_notes }}</td>
+                <td class="num">
+                    {% if item.cr_amt > 0 %}{{ item.cr_amt }}{% else %}-{% endif %}
+                </td>
+                <td class="num">
+                    {% if item.dr_amt > 0 %}{{ item.dr_amt }}{% else %}-{% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="{% if tran_from_date != tran_to_date %}7{% else %}6{% endif %}" class="center">No matching records found!</td>
+            </tr>
+            {% endfor %}
+
+            {% if rows %}
+            <tr class="summary-row">
+                <td colspan="{% if tran_from_date != tran_to_date %}5{% else %}4{% endif %}" class="num">Total</td>
+                <td class="num" id="ledgerTotalCashIn">0</td>
+                <td class="num" id="ledgerTotalCashOut">0</td>
+            </tr>
+            <tr class="summary-row">
+                <td colspan="{% if tran_from_date != tran_to_date %}5{% else %}4{% endif %}" class="num">Closing Balance</td>
+                <td colspan="2" class="num" id="ledgerClosingBalance">0</td>
+            </tr>
+            {% endif %}
+        </tbody>
+    </table>
+
+</div>
+
+<script>
+function formatIndianCurrency(value) {
+    if (value === 0 || !value) return "0";
+    return new Intl.NumberFormat("en-IN", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+    }).format(Number(value));
+}
+
+function formatQty(value) {
+    if (value === 0 || !value) return "-";
+    return Number(value).toLocaleString("en-IN");
+}
+
+function processReportTotals() {
+    let grandCashIn = 0;
+    let grandCashOut = 0;
+    let initialOpeningBalance = 0;
+    let finalClosingBalance = 0;
+
+    let pivotData = {};
+    
+    // 1. Process Account Rows Data
+    const rowsDataset = [
+        {% for item in rows %}
+        {
+            refType: "{{ item.acctran_ref_type|escapejs }}" || "Other",
+            cr: Number("{{ item.cr_amt|default:0 }}"),
+            dr: Number("{{ item.dr_amt|default:0 }}"),
+            openBal: Number("{{ item.open_balance|default:0 }}"),
+            closeBal: Number("{{ item.balance|default:0 }}")
+        }{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ];
+
+    rowsDataset.forEach((row, idx) => {
+        grandCashIn += row.cr;
+        grandCashOut += row.dr;
+
+        if (idx === 0) initialOpeningBalance = row.openBal;
+        if (idx === rowsDataset.length - 1) finalClosingBalance = row.closeBal;
+
+        if (!pivotData[row.refType]) { pivotData[row.refType] = { in: 0, out: 0 }; }
+        pivotData[row.refType].in += row.cr;
+        pivotData[row.refType].out += row.dr;
+    });
+
+    // 2. Process Stock Transactions Data
+    const stockDataset = [
+        {% for detail in stockTrans %}
+        {
+            itemCode: "{{ detail.item_code|escapejs }}",
+            refType: "{{ detail.acctran_ref_type|escapejs }}" || "Other",
+            stockIn: Number("{{ detail.stock_in|default:0 }}"),
+            stockOut: Number("{{ detail.stock_out|default:0 }}")
+        }{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ];
+
+    // Gather unique item codes and unique reference types dynamically using ES6 Sets
+    let uniqueItemCodes = new Set();
+    let uniqueRefTypes = new Set();
+    let stockPivotData = {};
+
+    stockDataset.forEach(detail => {
+        let code = detail.itemCode;
+        let ref = detail.refType;
+
+        uniqueItemCodes.add(code);
+        uniqueRefTypes.add(ref);
+
+        if (!stockPivotData[code]) { stockPivotData[code] = {}; }
+        if (!stockPivotData[code][ref]) { stockPivotData[code][ref] = 0; }
+
+        if (detail.stockIn > 0) stockPivotData[code][ref] += detail.stockIn;
+        if (detail.stockOut > 0) stockPivotData[code][ref] += detail.stockOut;
+    });
+
+    // Convert sets to sorted arrays
+    const sortedRefTypes = Array.from(uniqueRefTypes).sort();
+    const sortedItemCodes = Array.from(uniqueItemCodes).sort();
+
+    // Dynamically render headers and matrix rows to remove duplicates permanently
+    const headerRow = document.getElementById("stockPivotHeaderRow");
+    const tbodyElement = document.getElementById("stockPivotBody");
+
+    if (headerRow && tbodyElement) {
+        // Append unique headers
+        sortedRefTypes.forEach(ref => {
+            let th = document.createElement("th");
+            th.className = "w-min";
+            th.innerText = ref;
+            headerRow.appendChild(th);
+        });
+
+        // Append item matrix data rows
+        sortedItemCodes.forEach(code => {
+            let tr = document.createElement("tr");
+            tr.className = "stock-pivot-row";
+            
+            let itemTh = document.createElement("th");
+            itemTh.className = "w-min";
+            itemTh.style.fontWeight = "bold";
+            itemTh.innerText = code;
+            tr.appendChild(itemTh);
+
+            sortedRefTypes.forEach(ref => {
+                let td = document.createElement("td");
+                td.className = "num stock-pivot-cell w-min";
+                let finalQty = stockPivotData[code][ref] || 0;
+                td.innerText = formatQty(finalQty);
+                tr.appendChild(td);
+            });
+
+            tbodyElement.appendChild(tr);
+        });
+    }
+
+    // Render Account Totals
+    if (document.getElementById("ledgerTotalCashIn")) {
+        document.getElementById("ledgerTotalCashIn").innerText = formatIndianCurrency(grandCashIn);
+        document.getElementById("ledgerTotalCashOut").innerText = formatIndianCurrency(grandCashOut);
+        document.getElementById("pivotGrandCashIn").innerText = formatIndianCurrency(grandCashIn);
+        document.getElementById("pivotGrandCashOut").innerText = formatIndianCurrency(grandCashOut);
+        
+        const topOpen = document.getElementById("topOpeningBalance");
+        if(topOpen) topOpen.innerText = formatIndianCurrency(initialOpeningBalance);
+        
+        const lClose = document.getElementById("ledgerClosingBalance");
+        if(lClose) lClose.innerText = formatIndianCurrency(finalClosingBalance);
+
+        document.querySelectorAll(".pivot-data-row").forEach(rowElement => {
+            const typeKey = rowElement.getAttribute("data-ref-type");
+            const dataForType = pivotData[typeKey] || { in: 0, out: 0 };
+            rowElement.querySelector(".pivot-in-cell").innerText = formatIndianCurrency(dataForType.in);
+            rowElement.querySelector(".pivot-out-cell").innerText = formatIndianCurrency(dataForType.out);
+        });
+    }
+
+    setTimeout(() => {
+        window.print();
+    }, 400);
+}
+
+window.addEventListener("DOMContentLoaded", processReportTotals);
+</script>
+
+</body>
+</html>

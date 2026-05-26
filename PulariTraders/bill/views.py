@@ -123,7 +123,7 @@ def bill(request, rid=None):
                     rcpt_date=bill_header.bh_bill_date,
                     rcpt_amt=bill_header.bh_net_amount,
                     rcpt_acc_rid=bill_header.bh_acc_rid,
-                    rcpt_notes=f"Receipt for Bill {bill_header.bh_bill_no}",
+                    rcpt_notes=f"CASH PARTY {bill_header.bh_bill_no}",
                     rcpt_created_date=bill_header.bh_created_date,
                     rcpt_modified_date=bill_header.bh_modified_date
                 )

@@ -3,13 +3,6 @@ from django.http import JsonResponse
 from django.db import connection
 from datetime import date
 
-
-def transaction_print(request):
-	return render(request, "transactionbrowser/printtransactions.html")
-
-def transaction_print_by_account(request):
-	return render(request, "transactionbrowser/printtransactionsbyaccount.html")
-
 def transaction_browser(request):
 	accounts = []
 	today = date.today()

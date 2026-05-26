@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Report Print Preview</title>
+    <title>Report Print Preview - {{ report_type }}</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -32,11 +32,20 @@
             border-collapse: collapse;
             margin-bottom: 30px;
         }
+        
+        /* OPTIMIZATION: Shrinks the pivot layout footprint as tight as possible */
         .pivot-table {
-            width: 60% !important;
+            width: max-content !important; /* Force table to wrap tightly around contents */
+            table-layout: auto !important; /* Allow layout to shrink to minimum size */
             margin-bottom: 40px;
             margin-left: auto; 
+            margin-right: 0;
         }
+        .pivot-table th, .pivot-table td {
+            padding: 4px 8px !important;  /* Tight horizontal spacing alignment */
+            white-space: nowrap !important; /* Prevent text wrapping from widening fields */
+        }
+
         .report-table th, .report-table td {
             border: 1px solid #cccccc;
             padding: 6px 8px;
@@ -51,11 +60,15 @@
         .center-col { text-align: center; }
         
         /* Section styling rules */
-        .item-section-header {
-            background-color: #f9f9f9;
+        .item-section-title {
             font-weight: bold;
-            font-size: 12px;
+            font-size: 14px;
             color: #004499;
+            margin-top: 25px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            border-left: 4px solid #0066cc;
+            padding-left: 8px;
         }
         .subtotal-row {
             font-weight: bold;
@@ -84,7 +97,9 @@
         @media print {
             .control-panel { display: none !important; }
             body { margin: 0; font-size: 11px; }
-            tr { page-break-inside: avoid; }
+            .report-table { page-break-inside: auto; }
+            tr { page-break-inside: avoid; page-break-after: auto; }
+            .item-section-title { page-break-after: avoid; }
         }
     </style>
 </head>
@@ -96,187 +111,156 @@
     </div>
 
     <div class="header">
-        <h2 id="reportTitle">Report</h2>    
+        <h2>{{ report_type }}</h2>    
     </div>
 
     <div class="meta-bar">
-        <div id="metaDates">Date Coverage: All Records</div>
-        <div id="metaTimestamp"></div>
+        <div>
+            <strong>Period:</strong> 
+            {% if tran_from_date == tran_to_date %}
+                {{ tran_from_date }}
+            {% else %}
+                {{ tran_from_date }} to {{ tran_to_date }}
+            {% endif %}
+        </div>
+        <div>Printed: {% now "d-m-Y H:i" %}</div>
     </div>
 
-    <!-- Pivot Matrix View Block (Grand Total Row Removed) -->
-    <table class="report-table pivot-table">
+    <table class="report-table pivot-table" id="summaryPivotMatrix">
         <thead>
             <tr>
-                <th style="width: 28%;">Item Code</th>
-                <th class="num-col" style="width: 15%;">Stock In</th>
-                <th class="num-col" style="width: 21%;">Stock In Amount</th>
-                <th class="num-col" style="width: 15%;">Stock Out</th>
-                <th class="num-col" style="width: 21%;">Stock Out Amt</th>
+                <th style="min-width: 120px;">Ref Type</th>
+                {% regroup details by item_code as columns_summary %}
+                {% for col_group in columns_summary %}
+                    <th class="num-col" style="text-align: center !important;">{{ col_group.grouper|default:"N/A" }}</th>
+                {% endfor %}
             </tr>
         </thead>
-        <tbody id="pivotContent">
+        <tbody id="pivotMatrixBody">
             <tr>
-                <td colspan="5" class="center-col">Generating matrix view summaries...</td>
+                <td class="center-col" colspan="{{ columns_summary|length|add:1 }}">Building matrix totals...</td>
             </tr>
         </tbody>
     </table>
-
-    <!-- Main Itemized Transaction Split Table -->
-    <table class="report-table">
-        <tbody id="printContent">
-            <tr>
-                <td id="initialLoadingCell" colspan="8" class="center-col">Loading report records...</td>
-            </tr>
-        </tbody>
-    </table>
+    
+    {% regroup details by item_code as item_sections %}
+    
+    {% for section in item_sections %}
+        <div class="item-section-title">Item: {{ section.grouper|default:"N/A" }}</div>
+        
+        <table class="report-table">
+            <thead>
+                <tr>
+                    <th style="width: 5%;">Sl No.</th>
+                    {% if not is_same_day %}
+                    <th style="width: 11%;">Date</th>
+                    {% endif %}
+                    <th style="width: 12%;">Item</th>
+                    <th style="width: 24%;">Account Name</th>
+                    <th style="width: 12%;">Ref Type</th>
+                    <th class="num-col" style="width: 9%;">Stock In</th>
+                    <th class="num-col" style="width: 9%;">Stock Out</th>
+                    <th class="num-col" style="width: 9%;">Stock In Amt</th>
+                    <th class="num-col" style="width: 9%;">Stock Out Amt</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in section.list %}
+                <tr>
+                    <td class="center-col">{{ row.slno }}</td>
+                    {% if not is_same_day %}
+                    <td>{{ row.trans_date }}</td>
+                    {% endif %}
+                    <td><strong>{{ row.item_code|default:"-" }}</strong></td>
+                    <td>{{ row.acc_disp_name }}</td>
+                    <td>{{ row.acctran_ref_type }}</td>
+                    
+                    <td class="num-col">{% if row.stock_in > 0 %}{{ row.stock_in }}{% else %}-{% endif %}</td>
+                    <td class="num-col">{% if row.stock_out > 0 %}{{ row.stock_out }}{% else %}-{% endif %}</td>
+                    <td class="num-col">{% if row.stock_in > 0 %}{{ row.item_tot_amt|floatformat:2 }}{% else %}-{% endif %}</td>
+                    <td class="num-col">{% if row.stock_out > 0 %}{{ row.item_tot_amt|floatformat:2 }}{% else %}-{% endif %}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% empty %}
+        <table class="report-table">
+            <tbody>
+                <tr>
+                    <td class="center-col" colspan="{% if is_same_day %}8{% else %}9{% endif %}">
+                        No data rows found matching the filter query parameters.
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    {% endfor %}
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            document.getElementById("metaTimestamp").innerText = "Printed: " + new Date().toLocaleString();
+            const matrixData = {};
+            const uniqueItems = [];
+            const uniqueRefTypes = [];
 
-            const records = JSON.parse(localStorage.getItem("print_report_payload"));
-            const metadata = JSON.parse(localStorage.getItem("print_report_metadata")) || {};
+            {% for col_group in columns_summary %}
+                uniqueItems.push("{{ col_group.grouper|escapejs }}");
+            {% endfor %}
 
-            let isSameDate = false;
-            if (metadata.from_date && metadata.to_date && metadata.from_date.trim() === metadata.to_date.trim()) {
-                isSameDate = true;
-            }
+            {% for row in details %}
+                (function() {
+                    const item = "{{ row.item_code|escapejs }}";
+                    const refType = "{{ row.acctran_ref_type|escapejs }}" || "Other";
+                    const coordinateKey = refType + "_" + item;
 
-            if (metadata.report_name) {
-                document.getElementById("reportTitle").innerText = metadata.report_name;
-            }
-            if (metadata.from_date || metadata.to_date) {
-                document.getElementById("metaDates").innerText = `Date Range: ${metadata.from_date || 'Start'} To ${metadata.to_date || 'End'}`;
-            }
-
-            const tbody = document.getElementById("printContent");
-            const pivotTbody = document.getElementById("pivotContent");
-            
-            tbody.innerHTML = "";
-            pivotTbody.innerHTML = "";
-
-            const totalCols = isSameDate ? 7 : 8;
-
-            if (!records || records.length === 0) {
-                const noDataRow = `<tr><td colspan="${totalCols}" class="center-col">No data rows found matching the filter query parameters.</td></tr>`;
-                tbody.innerHTML = noDataRow;
-                pivotTbody.innerHTML = `<tr><td colspan="5" class="center-col">No summary records compiled.</td></tr>`;
-                return;
-            }
-
-            function formatVal(val) {
-                const num = Number(val || 0);
-                if (num === 0) return "-";
-                return num.toFixed(2); 
-            }
-
-            // 1. Structural Grouping by Item Code
-            const sections = {};
-            records.forEach(row => {
-                const itemCode = row.item_code || "UNKNOWN ITEM";
-                if (!sections[itemCode]) {
-                    sections[itemCode] = [];
-                }
-                sections[itemCode].push(row);
-            });
-
-            const pivotSummary = {};
-
-            // 2. Process Sections and Accumulate Pivot Values
-            Object.keys(sections).forEach(itemCode => {
-                const headerTr = document.createElement("tr");
-                headerTr.className = "item-section-header";
-                headerTr.innerHTML = `<td colspan="${totalCols}">Item Code: ${itemCode}</td>`;
-                tbody.appendChild(headerTr);
-
-                let runningSerial = 1;
-                let subtotalInQty = 0;
-                let subtotalOutQty = 0;
-                let subtotalAmtIn = 0;
-                let subtotalAmtOut = 0;
-
-                sections[itemCode].sort((a, b) => {
-                    const qtyA = Number(a.stock_in || 0);
-                    const qtyB = Number(b.stock_in || 0);
-                    return qtyB - qtyA;
-                });
-
-                sections[itemCode].forEach(row => {
-                    const dataInQty = Number(row.stock_in || 0);
-                    const dataOutQty = Number(row.stock_out || 0);
-                    const rawAmount = Math.abs(Number(row.item_tot_amt || 0));
-
-                    let displayAmtIn = 0;
-                    let displayAmtOut = 0;
-
-                    if (dataInQty > 0) {
-                        displayAmtIn = rawAmount;
-                        displayAmtOut = 0;
-                    } else if (dataOutQty > 0) {
-                        displayAmtIn = 0;
-                        displayAmtOut = rawAmount;
+                    if (!uniqueRefTypes.includes(refType)) {
+                        uniqueRefTypes.push(refType);
                     }
 
-                    subtotalInQty += dataInQty;
-                    subtotalOutQty += dataOutQty;
-                    subtotalAmtIn += displayAmtIn;
-                    subtotalAmtOut += displayAmtOut;
+                    if (!matrixData[coordinateKey]) {
+                        matrixData[coordinateKey] = { netStock: 0, hasData: false };
+                    }
 
-                    let rowHtml = `<td class="center-col" style="width: 5%;">${runningSerial++}</td>`;
+                    const qtyIn = parseInt("{{ row.stock_in|default:0 }}") || 0;
+                    const qtyOut = parseInt("{{ row.stock_out|default:0 }}") || 0;
+
+                    if (qtyIn > 0) {
+                        matrixData[coordinateKey].netStock += qtyIn;
+                        matrixData[coordinateKey].hasData = true;
+                    }
+                    if (qtyOut > 0) {
+                        matrixData[coordinateKey].netStock -= qtyOut;
+                        matrixData[coordinateKey].hasData = true;
+                    }
+                })();
+            {% endfor %}
+
+            uniqueRefTypes.sort();
+
+            const tbody = document.getElementById("pivotMatrixBody");
+            let htmlRows = "";
+
+            uniqueRefTypes.forEach(refType => {
+                htmlRows += `<tr><td><strong>${refType}</strong></td>`;
+                
+                uniqueItems.forEach(item => {
+                    const lookupKey = refType + "_" + item;
+                    const metrics = matrixData[lookupKey] || { netStock: 0, hasData: false };
                     
-                    if (!isSameDate) {
-                        rowHtml += `<td style="width: 11%;">${row.trans_date || ''}</td>`;
-                        rowHtml += `<td style="width: 36%;">${row.acc_disp_name || ''}</td>`;
-                    } else {
-                        rowHtml += `<td style="width: 47%;">${row.acc_disp_name || ''}</td>`; 
+                    let displayValue = "-";
+                    if (metrics.hasData) {
+                        displayValue = metrics.netStock;
                     }
 
-                    rowHtml += `
-                        <td style="width: 12%;">${row.acctran_ref_type || ''}</td>
-                        <td class="num-col" style="width: 9%;">${formatVal(dataInQty)}</td>
-                        <td class="num-col" style="width: 9%;">${formatVal(displayAmtIn)}</td>
-                        <td class="num-col" style="width: 9%;">${formatVal(dataOutQty)}</td>
-                        <td class="num-col" style="width: 9%;">${formatVal(displayAmtOut)}</td>
-                    `;
-
-                    const tr = document.createElement("tr");
-                    tr.innerHTML = rowHtml;
-                    tbody.appendChild(tr);
+                    htmlRows += `<td class="num-col" style="text-align: right;">${displayValue}</td>`;
                 });
 
-                const subtotalTr = document.createElement("tr");
-                subtotalTr.className = "subtotal-row";
-                subtotalTr.innerHTML = `
-                    <td colspan="${isSameDate ? 3 : 4}" style="text-align: right;">${itemCode} (Total)</td>
-                    <td class="num-col">${formatVal(subtotalInQty)}</td>
-                    <td class="num-col">${formatVal(subtotalAmtIn)}</td>
-                    <td class="num-col">${formatVal(subtotalOutQty)}</td>
-                    <td class="num-col">${formatVal(subtotalAmtOut)}</td>
-                `;
-                tbody.appendChild(subtotalTr);
-
-                pivotSummary[itemCode] = {
-                    stock_in: subtotalInQty,
-                    stock_in_amt: subtotalAmtIn,
-                    stock_out: subtotalOutQty,
-                    stock_out_amt: subtotalAmtOut
-                };
+                htmlRows += `</tr>`;
             });
 
-            // 3. Render Pivot Rows dynamically using pivotSummary data map
-            Object.keys(pivotSummary).forEach(itemCode => {
-                const itemData = pivotSummary[itemCode];
-                const pTr = document.createElement("tr");
-                pTr.innerHTML = `
-                    <td><strong>${itemCode}</strong></td>
-                    <td class="num-col">${formatVal(itemData.stock_in)}</td>
-                    <td class="num-col">${formatVal(itemData.stock_in_amt)}</td>
-                    <td class="num-col">${formatVal(itemData.stock_out)}</td>
-                    <td class="num-col">${formatVal(itemData.stock_out_amt)}</td>
-                `;
-                pivotTbody.appendChild(pTr);
-            });
+            if (htmlRows) {
+                tbody.innerHTML = htmlRows;
+            } else {
+                tbody.innerHTML = `<tr><td class="center-col" colspan="${uniqueItems.length + 1}">- No Summary Data -</td></tr>`;
+            }
         });
     </script>
 </body>
