@@ -10,6 +10,37 @@ from django.db.models.functions import Concat
 from .models import Receipt
 from core.utils.formatter import clean_decimal
 
+from django.http import JsonResponse
+
+
+def get_customer_balance_sheet(request):
+    rid = request.GET.get('rid', 0)
+    last_n_no = 5  # Adjust this number to determine how many transactions you want to fetch
+
+    # Defensive parsing
+    try:
+        rid = int(rid) if rid else 0
+    except ValueError:
+        rid = 0
+
+    results = []
+    
+    # Call raw MySQL stored procedure
+    with connection.cursor() as cursor:
+        cursor.callproc('account_balance_sheet_last_n_tran', [rid, last_n_no])
+        
+        # Grab description row to map database columns dynamically to keys
+        columns = [col[0] for col in cursor.description] if cursor.description else []
+        
+        # Fetch rows and transform to list of dictionaries
+        if columns:
+            results = [
+                dict(zip(columns, row))
+                for row in cursor.fetchall()
+            ]
+
+    return JsonResponse(results, safe=False)
+
 def get_next_receipt_no():
     with connection.cursor() as cursor:
         cursor.execute("SELECT get_next_sequence('Receipt')")

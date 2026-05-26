@@ -1,3 +1,10 @@
+/* Change # to . to match the HTML class */
+.rowUnderline td {
+    border-bottom: 2px solid #ced4da;
+    padding-bottom: 8px;
+    /* Optional: gives breathing room above the line */
+}
+
 .validationError {
     color: red;
     font-size: 30px;
@@ -104,6 +111,12 @@ input[type="number"]::-webkit-inner-spin-button {
 input[type="number"] {
     text-align: right;
 
+}
+
+.readonly {
+    background-color: rgb(240, 240, 233) !important;
+    box-shadow: none !important;
+    outline: none !important;
 }
 
 input[readonly],

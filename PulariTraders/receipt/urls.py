@@ -24,4 +24,6 @@ urlpatterns = [
     path('', views.receipt, name='receipt'),
     path('<int:rid>/', views.receipt, name='rid'),
     
+    # AJAX / API Endpoints
+    path('api/customer-balance-sheet/', views.get_customer_balance_sheet, name='get_customer_balance_sheet'),
 ]
