@@ -51,14 +51,14 @@
             border-collapse: collapse;
             font-size: 11px;
             margin-bottom: 0;
-            width: auto; /* Allow layout engine to auto-size based on cell constraints */
+            width: auto;
         }
         
         .top-summary-pivot th, 
         .top-summary-pivot td {
             padding: 5px 8px;
             border: 1px solid #cfcfcf;
-            white-space: nowrap; /* Prevent internal wrapping so columns can achieve true minimum width */
+            white-space: nowrap;
         }
         
         .top-summary-pivot thead th {
@@ -84,12 +84,10 @@
             background: #fafafa;
         }
 
-        /* Force columns to collapse to the absolute minimum width of their contents */
         .w-min {
             width: 1%;
         }
 
-        /* Section block wrappers */
         .pivot-block {
             display: flex;
             flex-direction: column;
@@ -152,6 +150,9 @@
         <div>
             <div id="filtersTextDisplay" style="font-size: 13px; line-height: 1.5; margin-top: 4px;">
                 <strong>ACCOUNT TRANSACTION REPORT</strong><br>
+                {% if tran_account_rid and tran_account_rid > 0 and rows %}
+                    <strong>Account:</strong> {{ rows.0.acc_name }}<br>
+                {% endif %}
                 <strong>Period:</strong> 
                 {% if tran_from_date == tran_to_date %}
                     {{ tran_from_date }}
@@ -183,7 +184,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% regroup rows by acctran_ref_type as ref_type_summary %}
+                        {% regroup pivot_rows by acctran_ref_type as ref_type_summary %}
                         {% for group in ref_type_summary %}
                             <tr class="pivot-data-row" data-ref-type="{{ group.grouper|default:'Other' }}">
                                 <th class="w-min">{{ group.grouper|default:"Other" }}</th>
@@ -195,7 +196,7 @@
                         {% endfor %}
                         
                         <tr class="pivot-total-row">
-                            <th class="w-min">Total</th>
+                            <th class="w-min">Summary</th>
                             <td id="pivotGrandCashIn" class="w-min">-</td>
                             <td id="pivotGrandCashOut" class="w-min">-</td>
                         </tr>
@@ -209,10 +210,10 @@
                     <thead>
                         <tr id="stockPivotHeaderRow">
                             <th class="w-min">Item</th>
-                            </tr>
+                        </tr>
                     </thead>
                     <tbody id="stockPivotBody">
-                        </tbody>
+                    </tbody>
                 </table>
             </div>
             {% endif %}
@@ -227,26 +228,56 @@
                 {% if tran_from_date != tran_to_date %}
                     <th style="width: 10%;">Date</th>
                     <th style="width: 12%;">Ref Type</th>
-                    <th style="width: 25%;">Account</th>
-                    <th style="width: 24%;">Notes</th>
+                    {% if not tran_account_rid or tran_account_rid <= 0 %}
+                        <th style="width: 20%;">Account</th>
+                        <th style="width: 21%;">Notes</th>
+                    {% else %}
+                        <th style="width: 41%;">Notes</th>
+                    {% endif %}
                 {% else %}
                     <th style="width: 12%;">Ref Type</th>
-                    <th style="width: 30%;">Account</th>
-                    <th style="width: 29%;">Notes</th>
+                    {% if not tran_account_rid or tran_account_rid <= 0 %}
+                        <th style="width: 26%;">Account</th>
+                        <th style="width: 26%;">Notes</th>
+                    {% else %}
+                        <th style="width: 52%;">Notes</th>
+                    {% endif %}
                 {% endif %}
-                <th class="num" style="width: 12%;">Cash In</th>
-                <th class="num" style="width: 12%;">Cash Out</th>
+                <th class="num" style="width: 11%;">Cash In</th>
+                <th class="num" style="width: 11%;">Cash Out</th>
+                <th class="width: 14%;">Balance</th>
             </tr>
         </thead>
         <tbody id="reportBody">
-            {% for item in rows %}
+            {% if rows %}
             <tr>
+                <td></td>
+                {% if tran_from_date != tran_to_date %}
+                    <td></td>
+                {% endif %}
+                <td></td>
+                {% if not tran_account_rid or tran_account_rid <= 0 %}
+                    <td></td>
+                {% endif %}
+                <td></td>
+                <td></td>
+                <td></td>
+                <td class="num raw-opening-balance-cell">
+                    {{ rows.0.open_balance }}
+                </td>
+            </tr>
+            {% endif %}
+
+            {% for item in rows %}
+            <tr class="ledger-data-row">
                 <td class="center">{{ item.slno }}</td>
                 {% if tran_from_date != tran_to_date %}
                     <td class="nowrap">{{ item.acctran_date }}</td>
                 {% endif %}
                 <td>{{ item.acctran_ref_type }}</td>
-                <td>{{ item.acc_name }}</td>
+                {% if not tran_account_rid or tran_account_rid <= 0 %}
+                    <td>{{ item.acc_name }}</td>
+                {% endif %}
                 <td>{{ item.acc_notes }}</td>
                 <td class="num">
                     {% if item.cr_amt > 0 %}{{ item.cr_amt }}{% else %}-{% endif %}
@@ -254,22 +285,22 @@
                 <td class="num">
                     {% if item.dr_amt > 0 %}{{ item.dr_amt }}{% else %}-{% endif %}
                 </td>
+                <td class="num running-balance-cell">
+                    {{ item.balance }}
+                </td>
             </tr>
             {% empty %}
             <tr>
-                <td colspan="{% if tran_from_date != tran_to_date %}7{% else %}6{% endif %}" class="center">No matching records found!</td>
+                <td colspan="{% if tran_from_date != tran_to_date %}{% if tran_account_rid > 0 %}7{% else %}8{% endif %}{% else %}{% if tran_account_rid > 0 %}6{% else %}7{% endif %}{% endif %}" class="center">No matching records found!</td>
             </tr>
             {% endfor %}
 
             {% if rows %}
             <tr class="summary-row">
-                <td colspan="{% if tran_from_date != tran_to_date %}5{% else %}4{% endif %}" class="num">Total</td>
+                <td colspan="{% if tran_from_date != tran_to_date %}{% if tran_account_rid > 0 %}4{% else %}5{% endif %}{% else %}{% if tran_account_rid > 0 %}3{% else %}4{% endif %}{% endif %}" class="num">Summary</td>
                 <td class="num" id="ledgerTotalCashIn">0</td>
                 <td class="num" id="ledgerTotalCashOut">0</td>
-            </tr>
-            <tr class="summary-row">
-                <td colspan="{% if tran_from_date != tran_to_date %}5{% else %}4{% endif %}" class="num">Closing Balance</td>
-                <td colspan="2" class="num" id="ledgerClosingBalance">0</td>
+                <td class="num" id="ledgerTotalFinalBalance">0</td> 
             </tr>
             {% endif %}
         </tbody>
@@ -295,19 +326,16 @@ function processReportTotals() {
     let grandCashIn = 0;
     let grandCashOut = 0;
     let initialOpeningBalance = 0;
-    let finalClosingBalance = 0;
 
     let pivotData = {};
     
-    // 1. Process Account Rows Data
     const rowsDataset = [
         {% for item in rows %}
         {
             refType: "{{ item.acctran_ref_type|escapejs }}" || "Other",
             cr: Number("{{ item.cr_amt|default:0 }}"),
             dr: Number("{{ item.dr_amt|default:0 }}"),
-            openBal: Number("{{ item.open_balance|default:0 }}"),
-            closeBal: Number("{{ item.balance|default:0 }}")
+            openBal: Number("{{ item.open_balance|default:0 }}")
         }{% if not forloop.last %},{% endif %}
         {% endfor %}
     ];
@@ -317,14 +345,22 @@ function processReportTotals() {
         grandCashOut += row.dr;
 
         if (idx === 0) initialOpeningBalance = row.openBal;
-        if (idx === rowsDataset.length - 1) finalClosingBalance = row.closeBal;
 
         if (!pivotData[row.refType]) { pivotData[row.refType] = { in: 0, out: 0 }; }
         pivotData[row.refType].in += row.cr;
         pivotData[row.refType].out += row.dr;
     });
 
-    // 2. Process Stock Transactions Data
+    let finalClosingBalance = 0;
+    const visualRows = document.querySelectorAll(".ledger-data-row");
+    if (visualRows.length > 0) {
+        const lastRow = visualRows[visualRows.length - 1];
+        const balanceCell = lastRow.querySelector(".running-balance-cell");
+        if (balanceCell) {
+            finalClosingBalance = Number(balanceCell.innerText.replace(/,/g, '').trim()) || 0;
+        }
+    }
+
     const stockDataset = [
         {% for detail in stockTrans %}
         {
@@ -336,7 +372,6 @@ function processReportTotals() {
         {% endfor %}
     ];
 
-    // Gather unique item codes and unique reference types dynamically using ES6 Sets
     let uniqueItemCodes = new Set();
     let uniqueRefTypes = new Set();
     let stockPivotData = {};
@@ -355,25 +390,22 @@ function processReportTotals() {
         if (detail.stockOut > 0) stockPivotData[code][ref] += detail.stockOut;
     });
 
-    // Convert sets to sorted arrays
-    const sortedRefTypes = Array.from(uniqueRefTypes).sort();
-    const sortedItemCodes = Array.from(uniqueItemCodes).sort();
+    // Retain exact database presentation order for the stock matrices
+    const exactOrderRefTypes = Array.from(uniqueRefTypes);
+    const exactOrderItemCodes = Array.from(uniqueItemCodes);
 
-    // Dynamically render headers and matrix rows to remove duplicates permanently
     const headerRow = document.getElementById("stockPivotHeaderRow");
     const tbodyElement = document.getElementById("stockPivotBody");
 
     if (headerRow && tbodyElement) {
-        // Append unique headers
-        sortedRefTypes.forEach(ref => {
+        exactOrderRefTypes.forEach(ref => {
             let th = document.createElement("th");
             th.className = "w-min";
             th.innerText = ref;
             headerRow.appendChild(th);
         });
 
-        // Append item matrix data rows
-        sortedItemCodes.forEach(code => {
+        exactOrderItemCodes.forEach(code => {
             let tr = document.createElement("tr");
             tr.className = "stock-pivot-row";
             
@@ -383,7 +415,7 @@ function processReportTotals() {
             itemTh.innerText = code;
             tr.appendChild(itemTh);
 
-            sortedRefTypes.forEach(ref => {
+            exactOrderRefTypes.forEach(ref => {
                 let td = document.createElement("td");
                 td.className = "num stock-pivot-cell w-min";
                 let finalQty = stockPivotData[code][ref] || 0;
@@ -395,7 +427,6 @@ function processReportTotals() {
         });
     }
 
-    // Render Account Totals
     if (document.getElementById("ledgerTotalCashIn")) {
         document.getElementById("ledgerTotalCashIn").innerText = formatIndianCurrency(grandCashIn);
         document.getElementById("ledgerTotalCashOut").innerText = formatIndianCurrency(grandCashOut);
@@ -405,8 +436,14 @@ function processReportTotals() {
         const topOpen = document.getElementById("topOpeningBalance");
         if(topOpen) topOpen.innerText = formatIndianCurrency(initialOpeningBalance);
         
-        const lClose = document.getElementById("ledgerClosingBalance");
-        if(lClose) lClose.innerText = formatIndianCurrency(finalClosingBalance);
+        const rawOpenCell = document.querySelector(".raw-opening-balance-cell");
+        if (rawOpenCell) {
+            const rawVal = Number(rawOpenCell.innerText.trim()) || 0;
+            rawOpenCell.innerText = formatIndianCurrency(rawVal);
+        }
+
+        const totalFinalBal = document.getElementById("ledgerTotalFinalBalance");
+        if(totalFinalBal) totalFinalBal.innerText = formatIndianCurrency(finalClosingBalance);
 
         document.querySelectorAll(".pivot-data-row").forEach(rowElement => {
             const typeKey = rowElement.getAttribute("data-ref-type");

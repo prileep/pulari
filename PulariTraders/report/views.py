@@ -39,8 +39,8 @@ def printreport(request):
     
     tran_from_date = request.POST.get("tran_from_date", "").strip() or None
     tran_to_date = request.POST.get("tran_to_date", "").strip() or None
-    tran_account_rid = request.POST.get("tran_account_rid", "").strip() or 0
-    tran_item_rid = request.POST.get("tran_item_rid", "").strip() or 0
+    tran_account_rid = int(request.POST.get("tran_account_rid") or 0)
+    tran_item_rid = int(request.POST.get("tran_item_rid") or 0) 
     acctran_ref_type = request.POST.get("acctran_ref_type", "").strip() or None
 
     params = []
@@ -95,9 +95,9 @@ def printreport(request):
                 "open_balance": int(row["open_balance"] or 0)
             })
             
-        # 🌟 THE FIX: Sort rows alphabetically by reference type before returning.
-        # This groups identical reference types together so Django's {% regroup %} tag can merge them properly.
-        rows.sort(key=lambda x: (x.get("acctran_ref_type") or ""))
+        # Create a separate sorted list exclusively for the summary pivot matrix,
+        # leaving the original 'rows' in their exact procedure execution order.
+        pivot_rows = sorted(rows, key=lambda x: (x.get("acctran_ref_type") or ""))
 
         params = [
             tran_from_date,
@@ -107,17 +107,27 @@ def printreport(request):
             acctran_ref_type
         ]
         stockTrans = _stock_transaction_report(request, params)
+
+        tran_account_name = "All Accounts"
+        if(tran_account_rid > 0):
+            account = Account.objects.filter(acc_rid=tran_account_rid).first()
+            if account:
+                tran_account_name = account.acc_disp_name
+            else:
+                tran_account_name = "Unknown Account" 
         
         context = {
             "tran_from_date": tran_from_date,
             "tran_to_date": tran_to_date,
             "report_type": report_name,
             "rows": rows,
+            "pivot_rows": pivot_rows,
             "stockTrans": stockTrans,
+            "tran_account_rid": tran_account_rid,
+            "tran_account_name": tran_account_name
         }
         return render(request, "report/account_transaction_report.html", context)
 
-    # Fallback to prevent returning None if an invalid/blank report name arrives
     return redirect('report')
 
 def _stock_transaction_report(request, params):
