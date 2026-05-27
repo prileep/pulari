@@ -1,7 +1,7 @@
-<table class="boxShape entryForm" id="ReceiptTable">
+<table class="boxShape entryForm" id="PaymentTable">
     <tr class="formHeader">
         <td></td>
-        <td colspan="3" style="text-align:left;">Receipt</td>
+        <td colspan="3" style="text-align:left;">Payment</td>
         <td></td>
     </tr>
     <tr class="rowSpacing">
@@ -10,23 +10,23 @@
     
     <tr>
         <td style="width:1%;"></td>
-        <td style="width:22%;">Receipt Status</td>
+        <td style="width:22%;">Payment Status</td>
         <td style="width:1%;"></td>
         <td style="width:75%;">
             <table style="width:100%;">
                 <tr>
                     <td style="width:50%;">
                         <input type="text"
-                               id="rcpt_status"
-                               name="rcpt_status"
-                               value="{{ receipt.rcpt_status }}"
+                               id="pay_status"
+                               name="pay_status"
+                               value="{{ payment.pay_status }}"
                                class="form-control form-control-sm"
                                readonly>
                     </td>
                     <td style="width:1%;"></td>
                     <td style="width:49%;">
-                        {% if receipt.rcpt_rid and receipt.rcpt_status == 'Cancelled' %}
-                            <div class="cancelledTransaction">The Receipt is cancelled.</div>
+                        {% if payment.pay_rid and payment.pay_status == 'Cancelled' %}
+                            <div class="cancelledTransaction">The Payment is cancelled.</div>
                         {% endif %}
                     </td>
                 </tr>
@@ -40,16 +40,16 @@
     
     <tr>
         <td style="width:1%;"></td>
-        <td style="width:22%;">Receipt No</td>
+        <td style="width:22%;">Payment No</td>
         <td style="width:1%;"></td>
         <td style="width:75%;">
             <table style="width:100%;">
                 <tr>
                     <td style="width:50%;">
                         <input type="text"
-                               id="rcpt_no"
-                               name="rcpt_no"
-                               value="{{ receipt.rcpt_no|default:'' }}"
+                               id="pay_no"
+                               name="pay_no"
+                               value="{{ payment.pay_no|default:'' }}"
                                class="form-control form-control-sm"
                                readonly>
                     </td>
@@ -64,18 +64,18 @@
   
     <tr>
         <td></td>
-        <td>Receipt Date</td>
+        <td>Payment Date</td>
         <td></td>
         <td>
             <table style="width:100%;">
                 <tr>
                     <td style="width:50%;">
                         <input type="date"
-                               id="rcpt_date"
-                               name="rcpt_date"
-                               value="{% if receipt %}{{ receipt.rcpt_date|date:'Y-m-d' }}{% else %}{{ today|date:'Y-m-d' }}{% endif %}"
+                               id="pay_date"
+                               name="pay_date"
+                               value="{% if payment %}{{ payment.pay_date|date:'Y-m-d' }}{% else %}{{ today|date:'Y-m-d' }}{% endif %}"
                                class="form-control form-control-sm"
-                               {% if receipt.rcpt_rid %} readonly {% endif %}>
+                               {% if payment.pay_rid %} readonly {% endif %}>
                     </td>
 
                     <td style="width:50%;"></td>
@@ -95,24 +95,24 @@
                     <td style="width: 85%;">
                         <!-- hidden RID -->
                         <input type="hidden"
-                            id="rcpt_acc_rid"
-                            name="rcpt_acc_rid"
-                            value="{{ receipt.rcpt_acc_rid|default:'' }}">
+                            id="pay_acc_rid"
+                            name="pay_acc_rid"
+                            value="{{ payment.pay_acc_rid|default:'' }}">
 
                         <input type="text"
-                            id="rcpt_account_name"
-                            name="rcpt_account_name"
+                            id="pay_account_name"
+                            name="pay_account_name"
                             value="{{ account.acc_disp_name|default:'' }}"
                             class="form-control form-control-sm"
                             autocomplete="off"
-                            {% if receipt.rcpt_rid %} readonly {% endif %}>
+                            {% if payment.pay_rid %} readonly {% endif %}>
                         <div id="suggestionBox"
                             class="suggestion-box">
                         </div>
                     </td>
                     <td style="width: 15%;">
                         <input type="text"
-                            id="rcpt_account_code" name="rcpt_account_code"
+                            id="pay_account_code" name="pay_account_code"
                             value="{{ account.acc_code|default:'' }}"
                             class="form-control form-control-sm"
                             readonly tabindex="-1">
@@ -122,7 +122,7 @@
         </td>
         <td></td>
     </tr>
-    {% if not receipt.rcpt_rid %}
+    {% if not payment.pay_rid %}
     <tr>
         <td></td>
         <td>Account Balance</td>
@@ -132,7 +132,7 @@
                 <tr>
                     <td style="width:50%;">
                         <input type="number" step="1" step="1" oninput="this.value = this.value.replace(/\D/g, '')"
-                               id="rcpt_account_due_amt" name="rcpt_account_due_amt"
+                               id="pay_account_due_amt" name="pay_account_due_amt"
                                class="form-control form-control-sm price text-end" readonly>
                     </td>
 
@@ -152,10 +152,10 @@
                 <tr>
                     <td style="width:50%;">
                         <input type="number" step="1" step="1" oninput="this.value = this.value.replace(/\D/g, '')"
-                               id="rcpt_amt" name="rcpt_amt"
-                               value="{{ receipt.rcpt_amt|default:'' }}"
+                               id="pay_amt" name="pay_amt"
+                               value="{{ payment.pay_amt|default:'' }}"
                                class="form-control form-control-sm price text-end"
-                               {% if receipt.rcpt_rid %} readonly {% endif %}>
+                               {% if payment.pay_rid %} readonly {% endif %}>
                     </td>
 
                     <td style="width:50%;"></td>
@@ -170,11 +170,11 @@
         <td></td>
         <td>
             <input type="text"
-                   id="rcpt_notes"
-                   name="rcpt_notes"
-                   value="{{ receipt.rcpt_notes|default:'' }}"
+                   id="pay_notes"
+                   name="pay_notes"
+                   value="{{ payment.pay_notes|default:'' }}"
                    class="form-control form-control-sm"
-                   {% if receipt.rcpt_rid %} readonly {% endif %}>
+                   {% if payment.pay_rid %} readonly {% endif %}>
         </td>
         <td></td>
     </tr>

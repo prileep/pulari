@@ -12,8 +12,8 @@ class Payment(models.Model):
     pay_amt = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     pay_acc_rid = models.IntegerField()
     pay_notes = models.CharField(max_length=520, blank=True, null=True)
-    pay_created_date = models.DateField()
-    pay_modified_date = models.DateField()
+    pay_created_date = models.DateTimeField()
+    pay_modified_date = models.DateTimeField()
 
     class Meta:
         db_table = 'payment'

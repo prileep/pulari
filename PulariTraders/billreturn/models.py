@@ -14,8 +14,8 @@ class BillReturnHeader(models.Model):
     br_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     br_discount = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     br_net_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0)
-    br_created_date = models.DateTimeField(auto_now_add=True)
-    br_modified_date = models.DateTimeField(auto_now=True)
+    br_created_date = models.DateTimeField()
+    br_modified_date = models.DateTimeField()
 
     class Meta:
         db_table = 'bill_return_header'

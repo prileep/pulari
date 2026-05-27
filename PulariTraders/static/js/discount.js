@@ -29,6 +29,8 @@ function selectDiscountAccount(acc) {
         disc_acc_rid.value = "";
         disc_account_name.value = "";
         disc_account_code.value = "";
+
+        absShowAccountBalanceSheet(disc_acc_rid.value, disc_account_due_amt);
         return;
     }
 
@@ -36,4 +38,5 @@ function selectDiscountAccount(acc) {
     disc_account_name.value = acc.acc_disp_name;
     disc_account_code.value = acc.acc_code;
 
+    absShowAccountBalanceSheet(disc_acc_rid.value, disc_account_due_amt);
 }

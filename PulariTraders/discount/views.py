@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.db import transaction, connection
 from datetime import date
+from django.utils import timezone  # Standard utility for Django tracking
 
 from account.models import Account
 from django.db.models import Value
@@ -19,7 +20,8 @@ def get_next_discount_no():
 
 def discount(request, rid=None):
 
-    disc_rid = request.GET.get("disc_rid") or rid
+    if not rid:
+        rid = request.GET.get("rid")
 
     discount = None
     account = None
@@ -29,22 +31,47 @@ def discount(request, rid=None):
 
         with transaction.atomic():
 
-            disc_rid = request.POST.get("disc_rid")
+            rid = request.POST.get("rid")
 
-            Discount.objects.filter(disc_rid=disc_rid).update(
-                disc_status="Cancelled"
+            discount_obj = Discount.objects.filter(disc_rid=rid).first();
+
+            if discount_obj and discount_obj.disc_status != "Cancelled":
+                discount_obj.disc_status = "Cancelled"
+                discount_obj.disc_modified_date = timezone.now()
+                discount_obj.save()
+
+                with connection.cursor() as cursor:
+                    cursor.callproc('post_discount', [discount_obj.disc_rid])
+
+        messages.success(request, "Discount cancelled successfully ❌")
+        return redirect(f"/discount/{rid}/")
+    
+    # ================= SAVE BILL =================
+    elif request.method == "POST":
+
+        with transaction.atomic():
+
+            discount = Discount.objects.create(
+                disc_status='Active',
+                disc_no=get_next_discount_no(),
+                disc_date=request.POST.get("disc_date"),
+                disc_amt=clean_decimal(request.POST.get("disc_amt") or 0),
+                disc_acc_rid=request.POST.get("disc_acc_rid"),
+                disc_notes=request.POST.get("disc_notes"),
+                disc_created_date=timezone.now(),
+                disc_modified_date=timezone.now()
             )
 
             with connection.cursor() as cursor:
                 cursor.callproc('post_discount', [discount.disc_rid])
 
-        messages.success(request, "Discount cancelled successfully ❌")
+        messages.success(request, f"Discount {discount.disc_no} saved successfully ✅")
 
-        return redirect(f"/discount?disc_rid={disc_rid}")
+        return redirect(f"/discount/{discount.disc_rid}/")
 
-    # ================= LOAD BILL =================
-    if disc_rid:
-        discount = Discount.objects.filter(disc_rid=disc_rid).first()
+    # ================= LOAD DISCOUNT =================
+    if rid:
+        discount = Discount.objects.filter(disc_rid=rid).first()
 
         if discount:
             account = Account.objects.get(acc_rid=discount.disc_acc_rid)
@@ -57,28 +84,7 @@ def discount(request, rid=None):
         'acc_place', 'acc_phone', 'acc_address', 'acc_code'
     )
 
-    # ================= SAVE BILL =================
-    if request.method == "POST":
-
-        with transaction.atomic():
-
-            discount = Discount.objects.create(
-                disc_status='Active',
-                disc_no=get_next_discount_no(),
-                disc_date=request.POST.get("disc_date"),
-                disc_amt=clean_decimal(request.POST.get("disc_amt") or 0),
-                disc_acc_rid=request.POST.get("disc_acc_rid"),
-                disc_notes=request.POST.get("disc_notes"),
-                disc_created_date=date.today(),
-                disc_modified_date=date.today()
-            )
-
-            with connection.cursor() as cursor:
-                cursor.callproc('post_discount', [discount.disc_rid])
-
-        messages.success(request, f"Discount {discount.disc_no} saved successfully ✅")
-
-        return redirect(f"/discount?disc_rid={discount.disc_rid}")
+    
 
     return render(request, 'discount/discount.html', {
         'accounts': list(accounts),

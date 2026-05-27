@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.db import transaction, connection
 from datetime import date
+from django.utils import timezone  # Standard utility for Django tracking
 
 from receipt.models import Receipt
 from items.models import Item
@@ -61,6 +62,7 @@ def bill(request, rid=None):
 
             if bill_header and bill_header.bh_status != "Cancelled":
                 bill_header.bh_status = "Cancelled"
+                bill_header.bh_modified_date = timezone.now()
                 bill_header.save()
 
                 with connection.cursor() as cursor:
@@ -81,6 +83,7 @@ def bill(request, rid=None):
     # ================= SAVE BILL =================
     elif request.method == "POST":
         with transaction.atomic():
+
             bill_header = BillHeader.objects.create(
                 bh_status='Active',
                 bh_bill_no=get_next_bill_no(),
@@ -91,8 +94,8 @@ def bill(request, rid=None):
                 bh_amount=clean_decimal(request.POST.get("bh_amount") or 0),
                 bh_discount=clean_decimal(request.POST.get("bh_discount") or 0),
                 bh_net_amount=clean_decimal(request.POST.get("bh_net_amount") or 0),
-                bh_created_date=date.today(),
-                bh_modified_date=date.today()
+                bh_created_date=timezone.now(),
+                bh_modified_date=timezone.now()
             )
 
             bd_item_rid = request.POST.getlist("bd_item_rid")
@@ -124,8 +127,8 @@ def bill(request, rid=None):
                     rcpt_amt=bill_header.bh_net_amount,
                     rcpt_acc_rid=bill_header.bh_acc_rid,
                     rcpt_notes=f"CASH PARTY {bill_header.bh_bill_no}",
-                    rcpt_created_date=bill_header.bh_created_date,
-                    rcpt_modified_date=bill_header.bh_modified_date
+                    rcpt_created_date=timezone.now(),
+                    rcpt_modified_date=timezone.now()
                 )
 
                 with connection.cursor() as cursor:

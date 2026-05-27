@@ -1,0 +1,34 @@
+<table>
+    <tr class="rowSpacing">
+        <td style="width: 20%;"></td>
+        <td style="width: 80%;"></td>
+    </tr>
+    <tr>
+        <td>
+            {% if payment.pay_rid and payment.pay_status != 'Cancelled' %}
+                <input type="hidden" name="rid" value="{{ payment.pay_rid }}">
+
+                <button type="submit" 
+                        name="action" 
+                        value="cancel"
+                        formaction="/payment/"
+                        class="searchLink"
+                        style="background: none; border: none; padding: 0; cursor: pointer;"
+                        onclick="return confirm('Are you sure to cancel this payment?');">
+                Cancel this payment
+                </button>
+            {% endif %}
+        </td>
+        <td style="text-align: right;">
+            {% if payment.pay_rid %}
+                <button type="button" class="submitButton"
+                data-rid="{{ payment.pay_rid }}"
+                onclick="openPrintBill(this.dataset.rid)">Print</button>&nbsp;
+            {% else %}
+                <button type="submit" class="submitButton">Submit</button>&nbsp;
+            {% endif %}
+
+            <button type="button" onclick="window.location.href='/payment'" class="submitButton">Clear</button>
+        </td>
+    </tr>
+</table>

@@ -12,7 +12,7 @@
           id="pr_amount"
           name="pr_amount"
 
-          value="{{ purchasereturn_header.pr_amount|default:''}}"
+          value="{{ purchase_return_header.pr_amount|default:''}}"
           class="form-control form-control-sm price text-end"
           readonly tabindex="-1">
           </td>
@@ -29,7 +29,7 @@
           <input type="number" step="0.01"
           id="pr_discount" name="pr_discount"
 
-          value="{{ purchasereturn_header.pr_discount|default:''}}"
+          value="{{ purchase_return_header.pr_discount|default:''}}"
           class="form-control form-control-sm price text-end" readonly tabindex="-1">
           </td>
         <td></td>
@@ -48,11 +48,11 @@
             id="pr_net_amount"
             name="pr_net_amount"
 
-            value="{{ purchasereturn_header.pr_net_amount|default:''}}"
+            value="{{ purchase_return_header.pr_net_amount|default:''}}"
             class="form-control form-control-sm price text-end"
             onchange="adjustAmount()"
             tabindex="-1"
-            {% if purchasereturn_header.pr_purchase_return_no %}
+            {% if purchase_return_header.pr_purchase_return_no %}
               readonly
             {% endif%}
             >
@@ -66,16 +66,22 @@
     <td></td>
     <td style="width: 1%;"></td>
     <td style="width: 14%;">
-      {% if purchasereturn_header.pr_rid and purchasereturn_header.pr_status != 'Cancelled' %}
-        <a href="/purchasereturn?cancel=1&pr_rid={{ purchasereturn_header.pr_rid }}"
-          class="searchLink"
-          onclick="return confirm('Are you sure to cancel this purchasereturn?');">
-          Cancel this purchasereturn
-        </a>
+      {% if purchase_return_header.pr_rid and purchase_return_header.pr_status != 'Cancelled' %}
+
+        <input type="hidden" name="rid" value="{{ purchase_return_header.pr_rid }}">
+        <button type="submit" 
+                name="action" 
+                value="cancel"
+                formaction="/purchasereturn/"
+                class="searchLink"
+                style="background: none; border: none; padding: 0; cursor: pointer;"
+                onclick="return confirm('Are you sure to cancel this purchase return?');">
+          Cancel this purchase return
+        </button>
         {% endif %}
     </td>
     <td style="text-align: right; width: 84%;">
-      {% if purchasereturn_header.pr_rid %}
+      {% if purchase_return_header.pr_rid %}
         
       {% else %}
         <button type="submit" class="submitButton">Submit</button>&nbsp;

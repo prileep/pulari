@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.db import transaction, connection
 from datetime import date
+from django.utils import timezone  # Standard utility for Django tracking
 
 from items.models import Item
 from account.models import Account
@@ -67,6 +68,7 @@ def purchase(request, rid=None):
 
             if purchase_header: # Good practice to check for None
                 purchase_header.ph_status = "Cancelled"
+                purchase_header.ph_modified_date = timezone.now() # Update modified date when cancelling
                 purchase_header.save() # This works!
 
                 with connection.cursor() as cursor:
@@ -75,6 +77,54 @@ def purchase(request, rid=None):
         messages.success(request, "Purchase cancelled successfully ❌")
 
         return redirect(f"/purchase/{rid}/")
+    
+    # ================= SAVE PURCHASE =================
+    elif request.method == "POST":
+
+        with transaction.atomic():
+
+            current_timestamp = timezone.now()
+
+            purchase_header = PurchaseHeader.objects.create(
+                ph_status='Active',
+                ph_purchase_no=get_next_purchase_no(),
+                ph_purchase_date=request.POST.get("ph_purchase_date"),
+                ph_notes=request.POST.get("ph_notes"),
+                ph_counter_sale=request.POST.get("ph_counter_sale"),
+                ph_acc_rid=request.POST.get("ph_acc_rid"),
+                ph_amount=clean_decimal(request.POST.get("ph_amount") or 0),
+                ph_discount=clean_decimal(request.POST.get("ph_discount") or 0),
+                ph_net_amount=clean_decimal(request.POST.get("ph_net_amount") or 0),
+                ph_created_date=current_timestamp,
+                ph_modified_date=current_timestamp
+            )
+
+            itemRIDs = request.POST.getlist("pd_item_rid")
+            quantities = request.POST.getlist("pd_qty")
+            amounts = request.POST.getlist("pd_amount")
+            pd_total_amounts = request.POST.getlist("pd_total_amount")
+            for i in range(len(quantities)):
+
+                qty = quantities[i]
+                amt = amounts[i]
+
+                if not qty and not amt:
+                    continue
+
+                PurchaseDetail.objects.create(
+                    pd_ph_rid=purchase_header.ph_rid,
+                    pd_item_rid=itemRIDs[i],
+                    pd_qty=clean_decimal(qty),
+                    pd_amount=clean_decimal(amt),
+                    pd_total_amount=clean_decimal(pd_total_amounts[i])
+                )
+
+            with connection.cursor() as cursor:
+                cursor.callproc('post_purchase', [purchase_header.ph_rid])
+
+        messages.success(request, f"Purchase {purchase_header.ph_purchase_no} saved successfully ✅")
+
+        return redirect(f"/purchase/{purchase_header.ph_rid}")
 
     # ================= LOAD PURCHASE =================
     if rid:
@@ -108,51 +158,7 @@ def purchase(request, rid=None):
         'item_stk'
     )
 
-    # ================= SAVE PURCHASE =================
-    if request.method == "POST":
-
-        with transaction.atomic():
-
-            purchase_header = PurchaseHeader.objects.create(
-                ph_status='Active',
-                ph_purchase_no=get_next_purchase_no(),
-                ph_purchase_date=request.POST.get("ph_purchase_date"),
-                ph_notes=request.POST.get("ph_notes"),
-                ph_counter_sale=request.POST.get("ph_counter_sale"),
-                ph_acc_rid=request.POST.get("ph_acc_rid"),
-                ph_amount=clean_decimal(request.POST.get("ph_amount") or 0),
-                ph_discount=clean_decimal(request.POST.get("ph_discount") or 0),
-                ph_net_amount=clean_decimal(request.POST.get("ph_net_amount") or 0),
-                ph_created_date=date.today(),
-                ph_modified_date=date.today()
-            )
-
-            itemRIDs = request.POST.getlist("pd_item_rid")
-            quantities = request.POST.getlist("pd_qty")
-            amounts = request.POST.getlist("pd_amount")
-            pd_total_amounts = request.POST.getlist("pd_total_amount")
-            for i in range(len(quantities)):
-
-                qty = quantities[i]
-                amt = amounts[i]
-
-                if not qty and not amt:
-                    continue
-
-                PurchaseDetail.objects.create(
-                    pd_ph_rid=purchase_header.ph_rid,
-                    pd_item_rid=itemRIDs[i],
-                    pd_qty=clean_decimal(qty),
-                    pd_amount=clean_decimal(amt),
-                    pd_total_amount=clean_decimal(pd_total_amounts[i])
-                )
-
-            with connection.cursor() as cursor:
-                cursor.callproc('post_purchase', [purchase_header.ph_rid])
-
-        messages.success(request, f"Purchase {purchase_header.ph_purchase_no} saved successfully ✅")
-
-        return redirect(f"/purchase?ph_rid={purchase_header.ph_rid}")
+    
 
     return render(request, 'purchase/purchase.html', {
         'accounts': list(accounts),

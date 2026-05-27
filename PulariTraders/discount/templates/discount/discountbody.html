@@ -16,6 +16,7 @@
             <table style="width:100%;">
                 <tr>
                     <td style="width:50%;">
+
                         <input type="text"
                                id="disc_status"
                                name="disc_status"
@@ -88,7 +89,7 @@
         <td>
             <table>
                 <tr>
-                    <td style="width: 90%;">
+                    <td style="width: 85%;">
                         <!-- hidden RID -->
                         <input type="hidden"
                             id="disc_acc_rid"
@@ -106,7 +107,7 @@
                             class="suggestion-box">
                         </div>
                     </td>
-                    <td style="width: 10%;">
+                    <td style="width: 15%;">
                         <input type="text"
                             id="disc_account_code" name="disc_account_code"
                             value="{{ account.acc_code|default:'' }}"
@@ -118,6 +119,27 @@
         </td>
         <td></td>
     </tr>
+    {% if not discount.disc_rid %}
+    <tr>
+        <td></td>
+        <td>Account Balance</td>
+        <td></td>
+        <td>
+            <table style="width:100%;">
+                <tr>
+                    <td style="width:50%;">
+                        <input type="number" step="1" step="1" oninput="this.value = this.value.replace(/\D/g, '')"
+                               id="disc_account_due_amt" name="disc_account_due_amt"
+                               class="form-control form-control-sm price text-end" readonly>
+                    </td>
+
+                    <td style="width:50%;"></td>
+                </tr>
+            </table>
+        </td>
+        <td></td>
+    </tr>
+    {% endif %}
 
     <tr>
         <td></td>

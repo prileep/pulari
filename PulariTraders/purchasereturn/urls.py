@@ -22,6 +22,4 @@ from django.urls import path,include
 urlpatterns = [
     path('', views.purchasereturn, name='purchasereturn'),
     path('<int:rid>/', views.purchasereturn, name='rid'),
-
-
 ]

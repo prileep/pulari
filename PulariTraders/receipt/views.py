@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.db import transaction, connection
 from datetime import date
+from django.utils import timezone  # Standard utility for Django tracking
 
 from account.models import Account
 from django.db.models import Value
@@ -63,6 +64,7 @@ def receipt(request, rid=None):
 
             if receipt_obj and receipt_obj.rcpt_status != "Cancelled":
                 receipt_obj.rcpt_status = "Cancelled"
+                receipt_obj.rcpt_modified_date = timezone.now()
                 receipt_obj.save()
 
                 with connection.cursor() as cursor:
@@ -74,6 +76,8 @@ def receipt(request, rid=None):
     # ================= SAVE RECEIPT =================
     elif request.method == "POST":
         with transaction.atomic():
+            current_timestamp = timezone.now()
+
             receipt_obj = Receipt.objects.create(
                 rcpt_status='Active',
                 rcpt_no=get_next_receipt_no(),
@@ -81,8 +85,8 @@ def receipt(request, rid=None):
                 rcpt_amt=clean_decimal(request.POST.get("rcpt_amt") or 0),
                 rcpt_acc_rid=int(request.POST.get("rcpt_acc_rid") or 0),
                 rcpt_notes=request.POST.get("rcpt_notes"),
-                rcpt_created_date=date.today(),
-                rcpt_modified_date=date.today()
+                rcpt_created_date=current_timestamp,
+                rcpt_modified_date=current_timestamp
             )
 
             with connection.cursor() as cursor:

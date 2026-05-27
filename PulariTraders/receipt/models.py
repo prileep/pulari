@@ -12,8 +12,8 @@ class Receipt(models.Model):
     rcpt_amt = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     rcpt_acc_rid = models.IntegerField()
     rcpt_notes = models.CharField(max_length=520, blank=True, null=True)
-    rcpt_created_date = models.DateField()
-    rcpt_modified_date = models.DateField()
+    rcpt_created_date = models.DateTimeField()
+    rcpt_modified_date = models.DateTimeField()
 
     class Meta:
         db_table = 'receipt'

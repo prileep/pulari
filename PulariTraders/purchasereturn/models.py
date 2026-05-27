@@ -15,8 +15,8 @@ class PurchasereturnHeader(models.Model):
     pr_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     pr_discount = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     pr_net_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0)
-    pr_created_date = models.DateTimeField(auto_now_add=True)
-    pr_modified_date = models.DateTimeField(auto_now=True)
+    pr_created_date = models.DateTimeField()
+    pr_modified_date = models.DateTimeField()
 
     class Meta:
         db_table = 'purchase_return_header'

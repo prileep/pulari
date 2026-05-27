@@ -15,8 +15,8 @@ class PurchaseHeader(models.Model):
     ph_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     ph_discount = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     ph_net_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0)
-    ph_created_date = models.DateTimeField(auto_now_add=True)
-    ph_modified_date = models.DateTimeField(auto_now=True)
+    ph_created_date = models.DateTimeField()
+    ph_modified_date = models.DateTimeField()
 
     class Meta:
         db_table = 'purchase_header'

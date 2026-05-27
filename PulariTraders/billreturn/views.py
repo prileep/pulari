@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.db import transaction, connection
 from datetime import date
+from django.utils import timezone  # Standard utility for Django tracking
 
 from items.models import Item
 from account.models import Account
@@ -36,6 +37,7 @@ def billreturn(request, rid=None):
 
             if bill_return_header: # Good practice to check for None
                 bill_return_header.br_status = "Cancelled"
+                bill_return_header.br_modified_date = timezone.now() # Update modified date when cancelling
                 bill_return_header.save() # This works!
 
                 with connection.cursor() as cursor:
@@ -81,7 +83,7 @@ def billreturn(request, rid=None):
     if request.method == "POST":
 
         with transaction.atomic():
-
+            current_timestamp = timezone.now()
             bill_return_header = BillReturnHeader.objects.create(
                 br_status='Active',
                 br_bill_return_no=get_next_bill_return_no(),
@@ -93,8 +95,8 @@ def billreturn(request, rid=None):
                 br_amount=clean_decimal(request.POST.get("br_amount") or 0),
                 br_discount=clean_decimal(request.POST.get("br_discount") or 0),
                 br_net_amount=clean_decimal(request.POST.get("br_net_amount") or 0),
-                br_created_date=date.today(),
-                br_modified_date=date.today()
+                br_created_date=current_timestamp,
+                br_modified_date=current_timestamp
             )
 
             itemRIDs = request.POST.getlist("brd_item_rid")

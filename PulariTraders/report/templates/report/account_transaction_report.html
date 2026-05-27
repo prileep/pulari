@@ -227,7 +227,7 @@
                     <th style="width: 12%;">Type</th>
                     {% if not tran_account_rid or tran_account_rid <= 0 %}
                         <th style="width: 20%;">Account</th>
-                        <th style="width: 21%;">Notes</th>
+                        <th style="width: 42%;">Notes</th>
                     {% else %}
                         <th style="width: 41%;">Notes</th>
                     {% endif %}
@@ -235,18 +235,20 @@
                     <th style="width: 12%;">Ref Type</th>
                     {% if not tran_account_rid or tran_account_rid <= 0 %}
                         <th style="width: 26%;">Account</th>
-                        <th style="width: 26%;">Notes</th>
+                        <th style="width: 46%;">Notes</th>
                     {% else %}
                         <th style="width: 52%;">Notes</th>
                     {% endif %}
                 {% endif %}
                 <th class="num" style="width: 11%;">Cash In</th>
                 <th class="num" style="width: 11%;">Cash Out</th>
-                <th class="width: 14%;">Balance</th>
+                {% if tran_account_rid and tran_account_rid > 0 %}
+                    <th style="width: 14%;">Balance</th>
+                {% endif %}
             </tr>
         </thead>
         <tbody id="reportBody">
-            {% if rows %}
+            {% if rows and tran_account_rid and tran_account_rid > 0 %}
             <tr>
                 <td></td>
                 {% if tran_from_date != tran_to_date %}
@@ -282,13 +284,15 @@
                 <td class="num">
                     {% if item.dr_amt > 0 %}{{ item.dr_amt }}{% else %}-{% endif %}
                 </td>
+                {% if tran_account_rid and tran_account_rid > 0 %}
                 <td class="num running-balance-cell">
                     {{ item.balance }}
                 </td>
+                {% endif %}
             </tr>
             {% empty %}
             <tr>
-                <td colspan="{% if tran_from_date != tran_to_date %}{% if tran_account_rid > 0 %}7{% else %}8{% endif %}{% else %}{% if tran_account_rid > 0 %}6{% else %}7{% endif %}{% endif %}" class="center">No matching records found!</td>
+                <td colspan="{% if tran_from_date != tran_to_date %}{% if tran_account_rid > 0 %}7{% else %}6{% endif %}{% else %}{% if tran_account_rid > 0 %}6{% else %}5{% endif %}{% endif %}" class="center">No matching records found!</td>
             </tr>
             {% endfor %}
 
@@ -297,7 +301,9 @@
                 <td colspan="{% if tran_from_date != tran_to_date %}{% if tran_account_rid > 0 %}4{% else %}5{% endif %}{% else %}{% if tran_account_rid > 0 %}3{% else %}4{% endif %}{% endif %}" class="num">Summary</td>
                 <td class="num" id="ledgerTotalCashIn">0</td>
                 <td class="num" id="ledgerTotalCashOut">0</td>
-                <td class="num" id="ledgerTotalFinalBalance">0</td> 
+                {% if tran_account_rid and tran_account_rid > 0 %}
+                    <td class="num" id="ledgerTotalFinalBalance">0</td> 
+                {% endif %}
             </tr>
             {% endif %}
         </tbody>
@@ -387,7 +393,6 @@ function processReportTotals() {
         if (detail.stockOut > 0) stockPivotData[code][ref] += detail.stockOut;
     });
 
-    // Retain exact database presentation order for the stock matrices
     const exactOrderRefTypes = Array.from(uniqueRefTypes);
     const exactOrderItemCodes = Array.from(uniqueItemCodes);
 

@@ -12,8 +12,8 @@ class Discount(models.Model):
     disc_amt = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     disc_acc_rid = models.IntegerField()
     disc_notes = models.CharField(max_length=520, blank=True, null=True)
-    disc_created_date = models.DateField()
-    disc_modified_date = models.DateField()
+    disc_created_date = models.DateTimeField()
+    disc_modified_date = models.DateTimeField()
 
     class Meta:
         db_table = 'discount'

@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.db import transaction, connection
 from datetime import date
+from django.utils import timezone  # Standard utility for Django tracking
 
 from account.models import Account
 from django.db.models import Value
@@ -17,9 +18,10 @@ def get_next_payment_no():
     return row[0]
 
 
-def payment(request):
+def payment(request, rid=None):
 
-    pay_rid = request.GET.get("pay_rid")
+    if not rid:
+        rid = request.GET.get("pay_rid")
 
     payment = None
     account = None
@@ -29,21 +31,24 @@ def payment(request):
 
         with transaction.atomic():
 
-            pay_rid = request.POST.get("pay_rid")
+            rid = request.POST.get("rid")
 
-            Payment.objects.filter(pay_rid=pay_rid).update(
-                pay_status="Cancelled"
-            )
-            with connection.cursor() as cursor:
-                cursor.callproc('post_payment', [payment.pay_rid])
+            payment = Payment.objects.filter(pay_rid=rid).first();
+            if payment and payment.pay_status != "Cancelled":
+                payment.pay_status = "Cancelled"
+                payment.pay_modified_date = timezone.now()
+                payment.save()
+
+                with connection.cursor() as cursor:
+                    cursor.callproc('post_payment', [payment.pay_rid])
 
         messages.success(request, "Payment cancelled successfully ❌")
-
-        return redirect(f"/payment?pay_rid={pay_rid}")
+        
+        return redirect(f"/payment/{rid}")
 
     # ================= LOAD BILL =================
-    if pay_rid:
-        payment = Payment.objects.filter(pay_rid=pay_rid).first()
+    if rid:
+        payment = Payment.objects.filter(pay_rid=rid).first()
 
         if payment:
             account = Account.objects.get(acc_rid=payment.pay_acc_rid)
@@ -60,7 +65,7 @@ def payment(request):
     if request.method == "POST":
 
         with transaction.atomic():
-
+            
             payment = Payment.objects.create(
                 pay_status='Active',
                 pay_no=get_next_payment_no(),
@@ -68,8 +73,8 @@ def payment(request):
                 pay_amt=clean_decimal(request.POST.get("pay_amt") or 0),
                 pay_acc_rid=request.POST.get("pay_acc_rid"),
                 pay_notes=request.POST.get("pay_notes"),
-                pay_created_date=date.today(),
-                pay_modified_date=date.today()
+                pay_created_date=timezone.now(),
+                pay_modified_date=timezone.now()
             )
 
             with connection.cursor() as cursor:
