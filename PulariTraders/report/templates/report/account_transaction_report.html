@@ -149,23 +149,20 @@
     <div class="header">
         <div>
             <div id="filtersTextDisplay" style="font-size: 13px; line-height: 1.5; margin-top: 4px;">
-                <strong>ACCOUNT TRANSACTION REPORT</strong><br>
+                TRANSACTION REPORT<br>
                 {% if tran_account_rid and tran_account_rid > 0 and rows %}
-                    <strong>Account:</strong> {{ rows.0.acc_name }}<br>
+                    Account:<strong>{{ rows.0.acc_name }}</strong><br>
                 {% endif %}
-                <strong>Period:</strong> 
+                
+                <strong>
                 {% if tran_from_date == tran_to_date %}
-                    {{ tran_from_date }}
+                    Date:<strong>{{ tran_from_date }}</strong>
                 {% else %}
-                    {{ tran_from_date }} to {{ tran_to_date }}
+                    From:<strong>{{ tran_from_date }}</strong> <br> To:&nbsp;&nbsp;&nbsp;<strong>{{ tran_to_date }}</strong>
                 {% endif %}
+                </strong>
             </div>
 
-            {% if rows %}
-            <div class="balance-info">
-                Opening Balance: <span id="topOpeningBalance">0</span>
-            </div>
-            {% endif %}
 
             <div class="muted" style="margin-top: 6px;">
                 Printed on: <span>{% now "d-m-Y h:i A" %}</span>
@@ -227,7 +224,7 @@
                 <th class="center" style="width: 5%;">#</th>
                 {% if tran_from_date != tran_to_date %}
                     <th style="width: 10%;">Date</th>
-                    <th style="width: 12%;">Ref Type</th>
+                    <th style="width: 12%;">Type</th>
                     {% if not tran_account_rid or tran_account_rid <= 0 %}
                         <th style="width: 20%;">Account</th>
                         <th style="width: 21%;">Notes</th>
