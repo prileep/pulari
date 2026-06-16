@@ -92,7 +92,8 @@ def printreport(request):
                 "cr_amt": int(row["cr_amt"] or 0),
                 "dr_amt": int(row["dr_amt"] or 0),
                 "balance": int(row["balance"] or 0),
-                "open_balance": int(row["open_balance"] or 0)
+                "open_balance": int(row["open_balance"] or 0),
+                "closing_balance": int(row["closing_balance"] or 0)
             })
             
         # Create a separate sorted list exclusively for the summary pivot matrix,
@@ -115,7 +116,13 @@ def printreport(request):
                 tran_account_name = account.acc_disp_name
             else:
                 tran_account_name = "Unknown Account" 
-        
+
+        opening_balance = 0;
+        closing_balance = 0;
+        if rows and len(rows) > 0:
+            opening_balance = int(rows[0].get("open_balance", 0))
+            closing_balance = int(rows[0].get("closing_balance", 0))
+
         context = {
             "tran_from_date": tran_from_date,
             "tran_to_date": tran_to_date,
@@ -124,7 +131,9 @@ def printreport(request):
             "pivot_rows": pivot_rows,
             "stockTrans": stockTrans,
             "tran_account_rid": tran_account_rid,
-            "tran_account_name": tran_account_name
+            "tran_account_name": tran_account_name,
+            "opening_balance": int(opening_balance),
+            "closing_balance": closing_balance,
         }
         return render(request, "report/account_transaction_report.html", context)
 

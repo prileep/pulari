@@ -72,6 +72,7 @@ def bill(request, rid=None):
                     receipt = Receipt.objects.filter(rcpt_rid=bill_header.bh_rcpt_rid).first()
                     if receipt:
                         receipt.rcpt_status = "Cancelled"
+                        receipt.rcpt_modified_date = timezone.now()
                         receipt.save()
         
                         with connection.cursor() as cursor:
