@@ -175,8 +175,8 @@
                     <td>{{ row.acc_disp_name }}</td>
                     <td>{{ row.acctran_ref_type }}</td>
                     
-                    <td class="num-col">{% if row.stock_in > 0 %}{{ row.stock_in }}{% else %}-{% endif %}</td>
-                    <td class="num-col">{% if row.stock_out > 0 %}{{ row.stock_out }}{% else %}-{% endif %}</td>
+                    <td class="num-col">{% if row.stock_in > 0 %}{{ row.stock_in|floatformat:2 }}{% else %}-{% endif %}</td>
+                    <td class="num-col">{% if row.stock_out > 0 %}{{ row.stock_out|floatformat:2 }}{% else %}-{% endif %}</td>
                     <td class="num-col">{% if row.stock_in > 0 %}{{ row.item_tot_amt|floatformat:2 }}{% else %}-{% endif %}</td>
                     <td class="num-col">{% if row.stock_out > 0 %}{{ row.item_tot_amt|floatformat:2 }}{% else %}-{% endif %}</td>
                 </tr>
@@ -219,8 +219,8 @@
                         matrixData[coordinateKey] = { netStock: 0, hasData: false };
                     }
 
-                    const qtyIn = parseInt("{{ row.stock_in|default:0 }}") || 0;
-                    const qtyOut = parseInt("{{ row.stock_out|default:0 }}") || 0;
+                    const qtyIn = parseFloat("{{ row.stock_in|default:0 }}") || 0;
+                    const qtyOut = parseFloat("{{ row.stock_out|default:0 }}") || 0;
 
                     if (qtyIn > 0) {
                         matrixData[coordinateKey].netStock += qtyIn;
@@ -247,7 +247,7 @@
                     
                     let displayValue = "-";
                     if (metrics.hasData) {
-                        displayValue = metrics.netStock;
+                        displayValue = metrics.netStock.toFixed(2);
                     }
 
                     htmlRows += `<td class="num-col" style="text-align: right;">${displayValue}</td>`;

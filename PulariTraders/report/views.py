@@ -165,8 +165,8 @@ def _stock_transaction_report(request, params):
             "acctran_ref_type": row.get("acctran_ref_type") or "",
             "item_name": row.get("item_name") or "",
             "item_code": row.get("item_code") or "",
-            "stock_in": int(row.get("stock_in") or 0),
-            "stock_out": int(row.get("stock_out") or 0),
+            "stock_in": float(row.get("stock_in") or 0),
+            "stock_out": float(row.get("stock_out") or 0),
             "item_amt": float(row.get("item_amt") or 0),
             "item_tot_amt": float(row.get("item_tot_amt") or 0)
         })
